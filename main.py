@@ -159,17 +159,17 @@ class MyWindow(QMainWindow):
         self.nameTransformation = ''
 
         if self.action == "Filtro Fator &Gama":
-            self.script = '.\CorrecaoGama.py'
+            self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
             self.resultImage = 'images/imagem_com_filtro_fatorGama1_8.ppm'
             self.nameTransformation = "Transformação Fator Gama (Correção 1.8)"
 
         if self.action == "Filtro Ga&ussiano":
-            self.script = '.\Gaussiano.py'
+            self.script = 'filtrosDeTransformacao/Gaussiano.py'
             self.resultImage = 'images/imagem_com_filtro_gaussiano.ppm'
             self.nameTransformation = "Transformação Filtro Gaussiano"
 
         if self.action == "Filtro &Mediana":
-            self.script = '.\Mediana.py'
+            self.script = 'filtrosDeTransformacao/Mediana.py'
             self.resultImage = 'images/imagem_com_filtro_mediana.ppm'
             self.nameTransformation = "Transformação Filtro Mediana"
 
