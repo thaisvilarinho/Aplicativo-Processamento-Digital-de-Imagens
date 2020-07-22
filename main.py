@@ -1,9 +1,11 @@
 import sys
 import subprocess
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QSize, QTimer
+from PyQt5.QtCore import QTimer
+
+imagemResultado = 'imagemTransformada'
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -20,173 +22,214 @@ class MyWindow(QMainWindow):
 
     def widgets(self):
         # Criar a barra de menu
-        self.menuBar = self.menuBar()
+        self.barraMenu = self.menuBar()
 
-        #Criar menus
-        self.menuFile = self.menuBar.addMenu("&Arquivo")
-        self.menuTransformation = self.menuBar.addMenu("&Transformações")
-        self.menuAbout = self.menuBar.addMenu("&Sobre")
+        # Criar menus
+        self.menuArquivo = self.barraMenu.addMenu("&Arquivo")
+        self.menuTransformacao = self.barraMenu.addMenu("&Transformações")
+        self.menuSobre = self.barraMenu.addMenu("So&bre")
 
-        #Crias as actions
-        self.optionOpen = self.menuFile.addAction("A&brir")
-        self.optionOpen.triggered.connect(self.openFile)
-        self.optionOpen.setShortcut("Ctrl+A")
+        # Crias as actions
+        self.opcaoAbrir = self.menuArquivo.addAction("A&brir")
+        self.opcaoAbrir.triggered.connect(self.abrirArquivo)
+        self.opcaoAbrir.setShortcut("Ctrl+A")
 
-        self.menuFile.addSeparator()
-        self.optionClose = self.menuFile.addAction("F&echar")
-        self.optionClose.setShortcut("Ctrl+X")
-        self.optionClose.triggered.connect(self.close)
+        self.opcaoSalvarComo = self.menuArquivo.addAction("&Salvar como")
+        self.opcaoSalvarComo.triggered.connect(self.salvarAquivoComo)
+        self.opcaoSalvarComo.setShortcut("Ctrl+S")
 
-        self.correcaoGama = self.menuTransformation.addAction("Filtro Fator &Gama")
+        self.menuArquivo.addSeparator()
+        self.opcaoFechar = self.menuArquivo.addAction("F&echar")
+        self.opcaoFechar.setShortcut("Ctrl+X")
+        self.opcaoFechar.triggered.connect(self.close)
+
+        self.correcaoGama = self.menuTransformacao.addAction("Filtro Fator &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
-        self.correcaoGama.triggered.connect(self.transformation)
+        self.correcaoGama.triggered.connect(self.transformacao)
         self.correcaoGama.setCheckable(True)
         self.correcaoGama.setChecked(False)
 
-        self.filtroGaussiano = self.menuTransformation.addAction("Filtro Ga&ussiano")
+        self.filtroGaussiano = self.menuTransformacao.addAction("Filtro Ga&ussiano")
         self.filtroGaussiano.setShortcut("Ctrl+Shift+U")
-        self.filtroGaussiano.triggered.connect(self.transformation)
+        self.filtroGaussiano.triggered.connect(self.transformacao)
         self.filtroGaussiano.setCheckable(True)
         self.filtroGaussiano.setChecked(False)
 
-        self.filtroMediana = self.menuTransformation.addAction("Filtro &Mediana")
+        self.filtroMediana = self.menuTransformacao.addAction("Filtro &Mediana")
         self.filtroMediana.setShortcut("Ctrl+Shift+M")
-        self.filtroMediana.triggered.connect(self.transformation)
+        self.filtroMediana.triggered.connect(self.transformacao)
         self.filtroMediana.setCheckable(True)
         self.filtroMediana.setChecked(False)
 
-        self.optionAbout = self.menuAbout.addAction("S&obre o Aplicativo")
-        self.optionAbout.triggered.connect(self.showInformation)
-        self.optionInfoImage = self.menuAbout.addAction("&Informacões da Imagem")
-        self.optionInfoImage.triggered.connect(self.showInformation)
+        self.filtroNegativo = self.menuTransformacao.addAction("Filtro &Negativo")
+        self.filtroNegativo.setShortcut("Ctrl+Shift+N")
+        self.filtroNegativo.triggered.connect(self.transformacao)
+        self.filtroNegativo.setCheckable(True)
+        self.filtroNegativo.setChecked(False)
+
+        self.opcaoSobre = self.menuSobre.addAction("S&obre o Aplicativo")
+        self.opcaoSobre.triggered.connect(self.mostrarInformacoesImagem)
+        self.opcaoInfoImagem = self.menuSobre.addAction("&Informacões da Imagem")
+        self.opcaoInfoImagem.triggered.connect(self.mostrarInformacoesImagem)
 
         # Criar barra de status
-        self.statusBar = self.statusBar()
-        self.statusBar.showMessage("Seja bem-vindo(a) ao meu aplicativo", 3000)
+        self.barraStatus = self.statusBar()
+        self.barraStatus.showMessage("Seja bem-vindo(a) ao meu aplicativo", 3000)
 
         # Criando a barra de progresso
-        self.progressBar = QProgressBar()
-        #self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
+        self.barraProgresso = QProgressBar()
 
         # Timer
         self.timer = QTimer()
-        #self.timer.setInterval(1000)
+        # self.timer.setInterval(1000)
 
         # Criando Labels
-        self.progressBarLabel = QLabel("Progresso da Transformação...")
+        self.barraProgressoTexto = QLabel("Progresso da Transformação...")
 
         # Criando imagens
-        self.origImage = QLabel()
-        self.dirOrigImage = 'images/Lucca_Prometheus.ppm'
-        self.origImage.setPixmap(QPixmap(self.dirOrigImage))
-        #self.pixmapOrigImage = self.pixmapOrigImage.scaled(250, 250, QtCore.Qt.KeepAspectRatio)
-        self.origImage.setAlignment(QtCore.Qt.AlignCenter)
+        self.imagemOriginal = QLabel()
+        self.endImagemOriginal = ''
 
     def layouts(self):
         # Criando janela
-        self.window = QWidget(self)
-        self.setCentralWidget(self.window)
+        self.janelaAreaVisualizacao = QWidget(self)
+        self.setCentralWidget(self.janelaAreaVisualizacao)
 
         # Criando os layouts
-        self.mainLayout = QVBoxLayout()
-        self.topLayout = QVBoxLayout()
-        self.bottomLayout = QHBoxLayout()
+        self.layoutPrincipal = QVBoxLayout()
+        self.layoutTopo = QVBoxLayout()
+        self.layoutRodape = QHBoxLayout()
 
         # Adicionando os widgets
-        self.topLayout.addWidget(self.origImage)
-        self.bottomLayout.addWidget(self.progressBarLabel)
-        self.bottomLayout.addWidget(self.progressBar)
+        self.layoutTopo.addWidget(self.imagemOriginal)
+        self.layoutRodape.addWidget(self.barraProgressoTexto)
+        self.layoutRodape.addWidget(self.barraProgresso)
 
         # Adicionando layouts filhos na janela principal
-        self.mainLayout.addLayout(self.topLayout, 80)
-        self.mainLayout.addLayout(self.bottomLayout, 20)
+        self.layoutPrincipal.addLayout(self.layoutTopo, 80)
+        self.layoutPrincipal.addLayout(self.layoutRodape, 20)
 
-        self.window.setLayout(self.mainLayout)
+        self.janelaAreaVisualizacao.setLayout(self.layoutPrincipal)
 
-
-    def showInformation(self):
-
-        self.option = self.sender().text()
-        self.msg = QMessageBox()
-        self.msg.setIcon(QMessageBox.Information)
-
-        if self.option == "S&obre o Aplicativo":
-
-            self.msg.setWindowTitle("Sobre o Aplicativo")
-            self.msg.setText("Desenvolvido por Thaís Aparecida Vilarinho de Jesus")
-            self.msg.setInformativeText("Capinópolis-MG, 24 de Junho de 2020")
-            self.descricao = "Este aplicativo realiza as seguintes Transformações: " \
-                         "Fator Gama com correção 1.8, Filtro Gaussiano " \
-                         "e Filtro Mediana em Imagens coloridas"
-            self.msg.setDetailedText(self.descricao)
-
-        if self.option == "&Informacões da Imagem":
-            self.msg.setWindowTitle("Informações da Imagem")
-
+    def informacoesDaImagem(self):
+        try:
             # Informações da Imagem
-            self.parts = self.dirOrigImage.rpartition('/')
+            self.parts = self.endImagemOriginal.rpartition('/')
             self.nomeimagem = self.parts[2]
-            self.leituraimagem = open(self.dirOrigImage, "r+")
+            self.teste = self.imagem.rpartition('.')
+            self.leituraimagem = open(self.endImagemOriginal, "r+")
             self.tipoimagem = self.leituraimagem.readline()  # P3
             self.comentarioimagem = self.leituraimagem.readline()  # Comentário
             self.dimensoesimagem = self.leituraimagem.readline()  # Dimensões
             self.dimensoesimagem = self.dimensoesimagem.split()
             self.larguraimagem = self.dimensoesimagem[0]
             self.alturaimagem = self.dimensoesimagem[1]
+        except:
+            pass
 
-            self.msg.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem + "Comentário: " \
-                             + self.comentarioimagem + "Largura: " + self.larguraimagem\
-                             + "\n" + "Altura: " + self.alturaimagem)
+    def mostrarInformacoesImagem(self):
 
-        self.msg.exec_() # exibir a caixa de mensagem/diálogo
+        self.opcaoEscolhida = self.sender().text()
+        self.caixaMensagem = QMessageBox()
+        self.caixaMensagem.setIcon(QMessageBox.Information)
 
+        if self.opcaoEscolhida == "S&obre o Aplicativo":
+            self.caixaMensagem.setWindowTitle("Sobre o Aplicativo")
+            self.caixaMensagem.setText("Desenvolvido por Thaís Aparecida Vilarinho de Jesus")
+            self.caixaMensagem.setInformativeText("Capinópolis-MG, 24 de Junho de 2020")
+            self.descricao = "Este aplicativo realiza as seguintes Transformações em imagens com extensão" \
+                             " ppm, pgm e pbm: Negativo; Correção gamma; Transformação logarítmica; " \
+                             "Filtro Sharpen; Filtro mediana (Box blur); Filtro Gaussiano (3x3, 5x5, 7x7); " \
+                             "Detecção de bordas com Filtro de Sobel; " \
+                             "Transformações espaciais para detecção de bordas com filtros; " \
+                             "Conversão imagem colorida para escala de cinza; " \
+                             "Conversão imagem colorida para preto e branco; " \
+                             "Separação das camadas R, G e B; Erosão; Dilatação; Abertura e Fechamento"
+            self.caixaMensagem.setDetailedText(self.descricao)
+            self.caixaMensagem.exec_()
 
-    def openFile(self):
-        fileName, _ = QFileDialog.getOpenFileName(self, caption="Open Image",
-                                                            directory=QtCore.QDir.currentPath(),
-                                                            filter='All files(*.*);;Imagens(*.ppm; *.pgm; *.pbm)',
-                                                            initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
-        #print(fileName)
-        if fileName != '':
-            self.dirOrigImage = fileName
-            self.origImage.setPixmap(QPixmap(self.dirOrigImage))
+        if self.opcaoEscolhida == "&Informacões da Imagem":
+            if self.endImagemOriginal != '':
+                self.caixaMensagem.setWindowTitle("Informações da Imagem")
 
-    def transformation(self):
+                self.informacoesDaImagem()
+                print(self.teste)
+
+                self.caixaMensagem.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem + "Comentário: " \
+                                           + self.comentarioimagem + "Largura: " + self.larguraimagem \
+                                           + "\n" + "Altura: " + self.alturaimagem)
+
+                self.caixaMensagem.exec_()
+
+    def salvarAquivoComo(self):
+        global imagemResultado
+
+        imagemSalvaComo, _ = QFileDialog.getSaveFileName(self, caption='Salvar como')
+        #print("NewFileName: " + imagemSalvaComo)
+        if imagemSalvaComo != '':
+            imagemResultado = imagemSalvaComo
+
+    def abrirArquivo(self):
+        arquivoImagem, _ = QFileDialog.getOpenFileName(self, caption="Open Image",
+                                                  directory=QtCore.QDir.currentPath(),
+                                                  filter='All files(*.*);;Imagens(*.ppm; *.pgm; *.pbm)',
+                                                  initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
+        #print("FileName: " + arquivoImagem)
+        if arquivoImagem != '':
+            self.endImagemOriginal = arquivoImagem
+            self.OrigImagePixmap = QPixmap(self.endImagemOriginal)
+            self.exibirImagem()
+
+    def exibirImagem(self):
+        if self.OrigImagePixmap.width() > 800 or self.OrigImagePixmap.height() > 600:
+            self.OrigImagePixmap = self.OrigImagePixmap.scaled(800, 600, QtCore.Qt.KeepAspectRatio,
+                                                               QtCore.Qt.SmoothTransformation)
+
+        self.imagemOriginal.setPixmap(self.OrigImagePixmap)
+        self.imagemOriginal.setAlignment(QtCore.Qt.AlignCenter)
+
+    def transformacao(self):
+
+        global imagemResultado
         self.step = 0
-        self.progressBar.setValue(self.step)
-        self.inputImage = self.dirOrigImage
+        self.barraProgresso.setValue(self.step)
+        self.inputImage = self.endImagemOriginal
         self.action = self.sender().text()
-        self.nameTransformation = ''
 
-        if self.action == "Filtro Fator &Gama":
-            self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
-            self.resultImage = 'images/imagem_com_filtro_fatorGama1_8.ppm'
-            self.nameTransformation = "Transformação Fator Gama (Correção 1.8)"
+        try:
+            if self.action == "Filtro Fator &Gama":
+                self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
 
-        if self.action == "Filtro Ga&ussiano":
-            self.script = 'filtrosDeTransformacao/Gaussiano.py'
-            self.resultImage = 'images/imagem_com_filtro_gaussiano.ppm'
-            self.nameTransformation = "Transformação Filtro Gaussiano"
+            if self.action == "Filtro Ga&ussiano":
+                self.script = 'filtrosDeTransformacao/Gaussiano.py'
 
-        if self.action == "Filtro &Mediana":
-            self.script = 'filtrosDeTransformacao/Mediana.py'
-            self.resultImage = 'images/imagem_com_filtro_mediana.ppm'
-            self.nameTransformation = "Transformação Filtro Mediana"
+            if self.action == "Filtro &Mediana":
+                self.script = 'filtrosDeTransformacao/Mediana.py'
 
-        self.program = 'python ' + self.script + ' \"' + self.inputImage + '\" ' + self.resultImage
-        self.executeTransformation = subprocess.run(self.program, shell=True)
+            if self.action == "Filtro &Negativo":
+                if self.tipoimagem == 'P3':
+                    self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
+                elif self.tipoimagem == 'P2':
+                    self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
 
-        while self.step < 100:
-            if self.executeTransformation is not None:
-                self.step += 0.001
-                self.progressBar.setValue(int(self.step))
-            else:
-                break
+            self.program = 'python ' + self.script + ' \"' + self.inputImage + '\" ' + imagemResultado
+            self.executeTransformation = subprocess.run(self.program, shell=True)
 
-        self.dirTransfImage = self.resultImage
-        self.origImage.setPixmap(QPixmap(self.dirTransfImage))
+            while self.step < 100:
+                if self.executeTransformation is not None:
+                    self.step += 0.001
+                    self.barraProgresso.setValue(int(self.step))
+                else:
+                    break
 
-        self.statusBar.showMessage(self.nameTransformation + " finalizada", 5000)
+            self.dirTransfImage = imagemResultado
+            self.OrigImagePixmap = QPixmap(self.dirTransfImage)
+            self.exibirImagem()
+
+            self.barraStatus.showMessage("Aplicação " + self.action.replace("&", "") + " finalizada", 5000)
+        except:
+            pass
+
 
 def main():
     app = QApplication(sys.argv)
