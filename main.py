@@ -1,11 +1,12 @@
 import sys
+import os
 import subprocess
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
 
-imagemResultado = 'imagemTransformada'
+imagemResultado = 'images/imagemTransformada.ppm'
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -151,7 +152,7 @@ class MyWindow(QMainWindow):
                 self.informacoesDaImagem()
 
                 self.caixaMensagem.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem +
-                                           "Comentário: " + self.comentarioimagem + "Largura: " + self.larguraimagem \
+                                           "Comentário: " + self.comentarioimagem + "Largura: " + self.larguraimagem\
                                            + "\n" + "Altura: " + self.alturaimagem)
 
                 self.caixaMensagem.exec_()
@@ -169,11 +170,14 @@ class MyWindow(QMainWindow):
                                                   directory=QtCore.QDir.currentPath(),
                                                   filter='All files(*.*);;Imagens(*.ppm; *.pgm; *.pbm)',
                                                   initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
-        #print("FileName: " + arquivoImagem)
+
+
+
         if arquivoImagem != '':
             self.endImagemOriginal = arquivoImagem
             self.pixmapImagem = QPixmap(self.endImagemOriginal)
             self.exibirImagem()
+            self.extensaoImagemOriginal = os.path.splitext(arquivoImagem)[1]
 
     def exibirImagem(self):
         if self.pixmapImagem.width() > 800 or self.pixmapImagem.height() > 600:
@@ -202,9 +206,9 @@ class MyWindow(QMainWindow):
                 self.script = 'filtrosDeTransformacao/Mediana.py'
 
             if self.filtroEscolhido == "Filtro &Negativo":
-                if self.tipoimagem == 'P3':
+                if self.extensaoImagemOriginal == '.ppm':
                     self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
-                elif self.tipoimagem == 'P2':
+                elif self.extensaoImagemOriginal == '.pgm':
                     self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
 
             self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + imagemResultado
