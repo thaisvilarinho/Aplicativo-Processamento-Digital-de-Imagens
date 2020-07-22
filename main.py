@@ -68,9 +68,9 @@ class MyWindow(QMainWindow):
         self.filtroNegativo.setChecked(False)
 
         self.opcaoSobre = self.menuSobre.addAction("S&obre o Aplicativo")
-        self.opcaoSobre.triggered.connect(self.mostrarInformacoesImagem)
+        self.opcaoSobre.triggered.connect(self.mostrarInformacoesSobre)
         self.opcaoInfoImagem = self.menuSobre.addAction("&Informacões da Imagem")
-        self.opcaoInfoImagem.triggered.connect(self.mostrarInformacoesImagem)
+        self.opcaoInfoImagem.triggered.connect(self.mostrarInformacoesSobre)
 
         # Criar barra de status
         self.barraStatus = self.statusBar()
@@ -116,7 +116,6 @@ class MyWindow(QMainWindow):
             # Informações da Imagem
             self.parts = self.endImagemOriginal.rpartition('/')
             self.nomeimagem = self.parts[2]
-            self.teste = self.imagem.rpartition('.')
             self.leituraimagem = open(self.endImagemOriginal, "r+")
             self.tipoimagem = self.leituraimagem.readline()  # P3
             self.comentarioimagem = self.leituraimagem.readline()  # Comentário
@@ -127,7 +126,7 @@ class MyWindow(QMainWindow):
         except:
             pass
 
-    def mostrarInformacoesImagem(self):
+    def mostrarInformacoesSobre(self):
 
         self.opcaoEscolhida = self.sender().text()
         self.caixaMensagem = QMessageBox()
@@ -137,14 +136,11 @@ class MyWindow(QMainWindow):
             self.caixaMensagem.setWindowTitle("Sobre o Aplicativo")
             self.caixaMensagem.setText("Desenvolvido por Thaís Aparecida Vilarinho de Jesus")
             self.caixaMensagem.setInformativeText("Capinópolis-MG, 24 de Junho de 2020")
-            self.descricao = "Este aplicativo realiza as seguintes Transformações em imagens com extensão" \
-                             " ppm, pgm e pbm: Negativo; Correção gamma; Transformação logarítmica; " \
-                             "Filtro Sharpen; Filtro mediana (Box blur); Filtro Gaussiano (3x3, 5x5, 7x7); " \
-                             "Detecção de bordas com Filtro de Sobel; " \
-                             "Transformações espaciais para detecção de bordas com filtros; " \
-                             "Conversão imagem colorida para escala de cinza; " \
-                             "Conversão imagem colorida para preto e branco; " \
-                             "Separação das camadas R, G e B; Erosão; Dilatação; Abertura e Fechamento"
+            self.descricao = "Este aplicativo realiza Transformações em imagens com extensão ppm, pgm e pbm e " \
+                             "foi elaborado como forma de trabalho apresentado a disciplina de Processamento Digital" \
+                             "de Imagens no Curso Superior em Análise e Desenvolvimento de Sistemas, do Instituto " \
+                             "Federal de Educação, Ciência e Tecnologia do Triângulo Mineiro (IFTM) - Campus Ituiutaba"
+
             self.caixaMensagem.setDetailedText(self.descricao)
             self.caixaMensagem.exec_()
 
@@ -153,10 +149,9 @@ class MyWindow(QMainWindow):
                 self.caixaMensagem.setWindowTitle("Informações da Imagem")
 
                 self.informacoesDaImagem()
-                print(self.teste)
 
-                self.caixaMensagem.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem + "Comentário: " \
-                                           + self.comentarioimagem + "Largura: " + self.larguraimagem \
+                self.caixaMensagem.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem +
+                                           "Comentário: " + self.comentarioimagem + "Largura: " + self.larguraimagem \
                                            + "\n" + "Altura: " + self.alturaimagem)
 
                 self.caixaMensagem.exec_()
