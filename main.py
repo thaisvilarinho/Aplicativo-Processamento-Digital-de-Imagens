@@ -177,56 +177,56 @@ class MyWindow(QMainWindow):
         #print("FileName: " + arquivoImagem)
         if arquivoImagem != '':
             self.endImagemOriginal = arquivoImagem
-            self.OrigImagePixmap = QPixmap(self.endImagemOriginal)
+            self.pixmapImagem = QPixmap(self.endImagemOriginal)
             self.exibirImagem()
 
     def exibirImagem(self):
-        if self.OrigImagePixmap.width() > 800 or self.OrigImagePixmap.height() > 600:
-            self.OrigImagePixmap = self.OrigImagePixmap.scaled(800, 600, QtCore.Qt.KeepAspectRatio,
-                                                               QtCore.Qt.SmoothTransformation)
+        if self.pixmapImagem.width() > 800 or self.pixmapImagem.height() > 600:
+            self.pixmapImagem = self.pixmapImagem.scaled(800, 600, QtCore.Qt.KeepAspectRatio,
+                                                         QtCore.Qt.SmoothTransformation)
 
-        self.imagemOriginal.setPixmap(self.OrigImagePixmap)
+        self.imagemOriginal.setPixmap(self.pixmapImagem)
         self.imagemOriginal.setAlignment(QtCore.Qt.AlignCenter)
 
     def transformacao(self):
 
         global imagemResultado
-        self.step = 0
-        self.barraProgresso.setValue(self.step)
-        self.inputImage = self.endImagemOriginal
-        self.action = self.sender().text()
+        self.porcentagemProgresso = 0
+        self.barraProgresso.setValue(self.porcentagemProgresso)
+        self.entrada = self.endImagemOriginal
+        self.filtroEscolhido = self.sender().text()
 
         try:
-            if self.action == "Filtro Fator &Gama":
+            if self.filtroEscolhido == "Filtro Fator &Gama":
                 self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
 
-            if self.action == "Filtro Ga&ussiano":
+            if self.filtroEscolhido == "Filtro Ga&ussiano":
                 self.script = 'filtrosDeTransformacao/Gaussiano.py'
 
-            if self.action == "Filtro &Mediana":
+            if self.filtroEscolhido == "Filtro &Mediana":
                 self.script = 'filtrosDeTransformacao/Mediana.py'
 
-            if self.action == "Filtro &Negativo":
+            if self.filtroEscolhido == "Filtro &Negativo":
                 if self.tipoimagem == 'P3':
                     self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
                 elif self.tipoimagem == 'P2':
                     self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
 
-            self.program = 'python ' + self.script + ' \"' + self.inputImage + '\" ' + imagemResultado
-            self.executeTransformation = subprocess.run(self.program, shell=True)
+            self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + imagemResultado
+            self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
 
-            while self.step < 100:
-                if self.executeTransformation is not None:
-                    self.step += 0.001
-                    self.barraProgresso.setValue(int(self.step))
+            while self.porcentagemProgresso < 100:
+                if self.executarTransformacao is not None:
+                    self.porcentagemProgresso += 0.001
+                    self.barraProgresso.setValue(int(self.porcentagemProgresso))
                 else:
                     break
 
-            self.dirTransfImage = imagemResultado
-            self.OrigImagePixmap = QPixmap(self.dirTransfImage)
+            self.endImagemResultado = imagemResultado
+            self.pixmapImagem = QPixmap(self.endImagemResultado)
             self.exibirImagem()
 
-            self.barraStatus.showMessage("Aplicação " + self.action.replace("&", "") + " finalizada", 5000)
+            self.barraStatus.showMessage("Aplicação " + self.filtroEscolhido.replace("&", "") + " finalizada", 5000)
         except:
             pass
 
