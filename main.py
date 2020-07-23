@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
 
-imagemResultado = 'images/imagemTransformada.ppm'
+imagemResultado = 'images/imagemTransformada'
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -47,26 +47,18 @@ class MyWindow(QMainWindow):
         self.correcaoGama = self.menuTransformacao.addAction("Filtro Fator &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
         self.correcaoGama.triggered.connect(self.transformacao)
-        self.correcaoGama.setCheckable(True)
-        self.correcaoGama.setChecked(False)
 
         self.filtroGaussiano = self.menuTransformacao.addAction("Filtro Ga&ussiano")
         self.filtroGaussiano.setShortcut("Ctrl+Shift+U")
         self.filtroGaussiano.triggered.connect(self.transformacao)
-        self.filtroGaussiano.setCheckable(True)
-        self.filtroGaussiano.setChecked(False)
 
         self.filtroMediana = self.menuTransformacao.addAction("Filtro &Mediana")
         self.filtroMediana.setShortcut("Ctrl+Shift+M")
         self.filtroMediana.triggered.connect(self.transformacao)
-        self.filtroMediana.setCheckable(True)
-        self.filtroMediana.setChecked(False)
 
         self.filtroNegativo = self.menuTransformacao.addAction("Filtro &Negativo")
         self.filtroNegativo.setShortcut("Ctrl+Shift+N")
         self.filtroNegativo.triggered.connect(self.transformacao)
-        self.filtroNegativo.setCheckable(True)
-        self.filtroNegativo.setChecked(False)
 
         self.opcaoSobre = self.menuSobre.addAction("S&obre o Aplicativo")
         self.opcaoSobre.triggered.connect(self.mostrarInformacoesSobre)
@@ -161,23 +153,25 @@ class MyWindow(QMainWindow):
         global imagemResultado
 
         imagemSalvaComo, _ = QFileDialog.getSaveFileName(self, caption='Salvar como')
-        #print("NewFileName: " + imagemSalvaComo)
+
         if imagemSalvaComo != '':
             imagemResultado = imagemSalvaComo
 
     def abrirArquivo(self):
+        global porcentagemProgresso
         arquivoImagem, _ = QFileDialog.getOpenFileName(self, caption="Open Image",
                                                   directory=QtCore.QDir.currentPath(),
                                                   filter='All files(*.*);;Imagens(*.ppm; *.pgm; *.pbm)',
                                                   initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
 
-
-
         if arquivoImagem != '':
+            porcentagemProgresso = 0
+            self.barraProgresso.setValue(porcentagemProgresso)
             self.endImagemOriginal = arquivoImagem
             self.pixmapImagem = QPixmap(self.endImagemOriginal)
             self.exibirImagem()
-            self.extensaoImagemOriginal = os.path.splitext(arquivoImagem)[1]
+            self.extensaoImagemOriginal = os.path.splitext(os.path.basename(arquivoImagem))[1]
+
 
     def exibirImagem(self):
         if self.pixmapImagem.width() > 800 or self.pixmapImagem.height() > 600:
@@ -189,45 +183,59 @@ class MyWindow(QMainWindow):
 
     def transformacao(self):
 
-        global imagemResultado
-        self.porcentagemProgresso = 0
-        self.barraProgresso.setValue(self.porcentagemProgresso)
-        self.entrada = self.endImagemOriginal
-        self.filtroEscolhido = self.sender().text()
+        if self.endImagemOriginal != '':
+            global porcentagemProgresso
+            global imagemResultado
 
-        try:
-            if self.filtroEscolhido == "Filtro Fator &Gama":
-                self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
+            porcentagemProgresso = 0
+            self.barraProgresso.setValue(porcentagemProgresso)
+            self.entrada = self.endImagemOriginal
+            self.filtroEscolhido = self.sender().text()
 
-            if self.filtroEscolhido == "Filtro Ga&ussiano":
-                self.script = 'filtrosDeTransformacao/Gaussiano.py'
+            try:
+                if self.filtroEscolhido == "Filtro Fator &Gama":
+                    self.script = 'filtrosDeTransformacao/CorrecaoGama.py'
+                    self.correcaoGama.setCheckable(True)
+                    self.correcaoGama.setChecked(True)
 
-            if self.filtroEscolhido == "Filtro &Mediana":
-                self.script = 'filtrosDeTransformacao/Mediana.py'
+                if self.filtroEscolhido == "Filtro Ga&ussiano":
+                    self.script = 'filtrosDeTransformacao/Gaussiano.py'
+                    self.filtroGaussiano.setCheckable(True)
+                    self.filtroGaussiano.setChecked(True)
 
-            if self.filtroEscolhido == "Filtro &Negativo":
-                if self.extensaoImagemOriginal == '.ppm':
-                    self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
-                elif self.extensaoImagemOriginal == '.pgm':
-                    self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
+                if self.filtroEscolhido == "Filtro &Mediana":
+                    self.script = 'filtrosDeTransformacao/Mediana.py'
+                    self.filtroMediana.setCheckable(True)
+                    self.filtroMediana.setChecked(True)
 
-            self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + imagemResultado
-            self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
+                if self.filtroEscolhido == "Filtro &Negativo":
+                    if self.extensaoImagemOriginal == '.ppm':
+                        self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
+                        imagemResultado += '.ppm'
+                    elif self.extensaoImagemOriginal == '.pgm':
+                        self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
+                        imagemResultado += '.pgm'
+                    self.filtroNegativo.setCheckable(True)
+                    self.filtroNegativo.setChecked(True)
 
-            while self.porcentagemProgresso < 100:
-                if self.executarTransformacao is not None:
-                    self.porcentagemProgresso += 0.001
-                    self.barraProgresso.setValue(int(self.porcentagemProgresso))
-                else:
-                    break
+                self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + imagemResultado
+                self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
 
-            self.endImagemResultado = imagemResultado
-            self.pixmapImagem = QPixmap(self.endImagemResultado)
-            self.exibirImagem()
+                while porcentagemProgresso < 100:
+                    if self.executarTransformacao is not None:
+                        porcentagemProgresso += 0.001
+                        self.barraProgresso.setValue(int(porcentagemProgresso))
+                    else:
+                        break
 
-            self.barraStatus.showMessage("Aplicação " + self.filtroEscolhido.replace("&", "") + " finalizada", 5000)
-        except:
-            pass
+                self.endImagemResultado = imagemResultado
+                self.pixmapImagem = QPixmap(self.endImagemResultado)
+                self.exibirImagem()
+
+                self.barraStatus.showMessage("Aplicação " + self.filtroEscolhido.replace("&", "") +
+                                             " finalizada", 5000)
+            except:
+                pass
 
 
 def main():
