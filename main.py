@@ -1,12 +1,16 @@
 import sys
 import os
+import shutil
 import subprocess
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
+from win32api import GetSystemMetrics
 
+porcentagemProgresso = 0
 imagemResultado = 'images/imagemTransformada'
+extensaoImagemResultado = '.ppm'
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -82,6 +86,7 @@ class MyWindow(QMainWindow):
         # Criando imagens
         self.imagemOriginal = QLabel()
         self.endImagemOriginal = ''
+        self.endImagemResultado = ''
 
     def layouts(self):
         # Criando janela
@@ -150,21 +155,37 @@ class MyWindow(QMainWindow):
                 self.caixaMensagem.exec_()
 
     def salvarAquivoComo(self):
-        global imagemResultado
-
-        imagemSalvaComo, _ = QFileDialog.getSaveFileName(self, caption='Salvar como')
-
-        if imagemSalvaComo != '':
-            imagemResultado = imagemSalvaComo
+        global extensaoImagemResultado
+        try:
+            if self.endImagemOriginal != '':
+                imagemSalvaComo, tipos = QFileDialog.getSaveFileName(self, caption='Salvar como',
+                                                                     directory=QtCore.QDir.currentPath(),
+                                                                     filter='Imagens(*.ppm; *.pgm; *.pbm)',
+                                                                     initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
+                if imagemSalvaComo:
+                    self.parts = imagemSalvaComo.rpartition('/')
+                    self.endereco = self.parts[0]
+                    if self.endImagemResultado != '':
+                        shutil.copyfile(self.endImagemResultado, self.endereco + '/' +
+                                        os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
+                                        extensaoImagemResultado)
+                    else:
+                        shutil.copyfile(self.endImagemOriginal, self.endereco + '/' +
+                                        os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
+                                        self.extensaoImagemOriginal)
+        except:
+            pass
 
     def abrirArquivo(self):
         global porcentagemProgresso
+        self.removerCopiaTransformada()
+
         arquivoImagem, _ = QFileDialog.getOpenFileName(self, caption="Open Image",
                                                   directory=QtCore.QDir.currentPath(),
                                                   filter='All files(*.*);;Imagens(*.ppm; *.pgm; *.pbm)',
                                                   initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
 
-        if arquivoImagem != '':
+        if arquivoImagem:
             porcentagemProgresso = 0
             self.barraProgresso.setValue(porcentagemProgresso)
             self.endImagemOriginal = arquivoImagem
@@ -173,24 +194,41 @@ class MyWindow(QMainWindow):
             self.extensaoImagemOriginal = os.path.splitext(os.path.basename(arquivoImagem))[1]
 
 
+
     def exibirImagem(self):
-        if self.pixmapImagem.width() > 800 or self.pixmapImagem.height() > 600:
-            self.pixmapImagem = self.pixmapImagem.scaled(800, 600, QtCore.Qt.KeepAspectRatio,
-                                                         QtCore.Qt.SmoothTransformation)
+        if self.pixmapImagem.width() > int(GetSystemMetrics(0)/2) or \
+                self.pixmapImagem.height() > int(GetSystemMetrics(1)/2):
+            self.pixmapImagem = self.pixmapImagem.scaled(int(GetSystemMetrics(0)/2), int(GetSystemMetrics(1)/2),
+                                                         QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
         self.imagemOriginal.setPixmap(self.pixmapImagem)
         self.imagemOriginal.setAlignment(QtCore.Qt.AlignCenter)
+
+    def removerCopiaTransformada(self):
+        global imagemResultado
+        global extensaoImagemResultado
+        try:
+            if os.path.exists(imagemResultado + "Copia" + extensaoImagemResultado):
+                os.remove(imagemResultado + "Copia" + extensaoImagemResultado)
+        except:
+            pass
 
     def transformacao(self):
 
         if self.endImagemOriginal != '':
             global porcentagemProgresso
             global imagemResultado
+            global extensaoImagemResultado
 
             porcentagemProgresso = 0
             self.barraProgresso.setValue(porcentagemProgresso)
-            self.entrada = self.endImagemOriginal
             self.filtroEscolhido = self.sender().text()
+            self.entrada = self.endImagemOriginal
+
+            if os.path.exists(imagemResultado + "Copia" + extensaoImagemResultado):
+                self.entrada = imagemResultado + "Copia" + extensaoImagemResultado
+            else:
+                self.entrada = self.endImagemOriginal
 
             try:
                 if self.filtroEscolhido == "Filtro Fator &Gama":
@@ -211,14 +249,17 @@ class MyWindow(QMainWindow):
                 if self.filtroEscolhido == "Filtro &Negativo":
                     if self.extensaoImagemOriginal == '.ppm':
                         self.script = 'filtrosDeTransformacao/ColoridaNegativo.py'
-                        imagemResultado += '.ppm'
+                        self.extensaoImagemResultado = '.ppm'
+
                     elif self.extensaoImagemOriginal == '.pgm':
                         self.script = 'filtrosDeTransformacao/EscalaCinzaNegativo.py'
-                        imagemResultado += '.pgm'
+                        self.extensaoImagemResultado = '.pgm'
+
                     self.filtroNegativo.setCheckable(True)
                     self.filtroNegativo.setChecked(True)
 
-                self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + imagemResultado
+                self.argumentos = 'python ' + self.script + ' \"' + self.entrada + '\" ' + \
+                                  imagemResultado + extensaoImagemResultado
                 self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
 
                 while porcentagemProgresso < 100:
@@ -228,8 +269,9 @@ class MyWindow(QMainWindow):
                     else:
                         break
 
-                self.endImagemResultado = imagemResultado
+                self.endImagemResultado = imagemResultado + extensaoImagemResultado
                 self.pixmapImagem = QPixmap(self.endImagemResultado)
+                shutil.copyfile(self.endImagemResultado, imagemResultado + "Copia" + extensaoImagemResultado)
                 self.exibirImagem()
 
                 self.barraStatus.showMessage("Aplicação " + self.filtroEscolhido.replace("&", "") +
