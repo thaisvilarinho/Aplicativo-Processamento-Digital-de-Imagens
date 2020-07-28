@@ -391,7 +391,7 @@ class MyWindow(QMainWindow):
 
             if self.filtroEscolhido == 'Filtro S&harpen':
                 if self.extensaoImagemOriginal == '.ppm':
-                    print("ACRESCENTAR AQUI O CÓDIGO FILTRO SHARPEN EM IMAGEM COLORIDA")
+                    self.script = 'filtrosDeTransformacao/colorida/Sharpen.py'
 
                 elif self.extensaoImagemOriginal == '.pgm':
                     self.script = 'filtrosDeTransformacao/escalaCinza/Sharpen.py'
@@ -401,7 +401,7 @@ class MyWindow(QMainWindow):
 
             if self.filtroEscolhido == 'Filtro S&obel':
                 if self.extensaoImagemOriginal == '.ppm':
-                    print("ACRESCENTAR AQUI O CÓDIGO FILTRO SOBEL EM IMAGEM COLORIDA")
+                    self.script = 'filtrosDeTransformacao/colorida/Sobel.py'
 
                 elif self.extensaoImagemOriginal == '.pgm':
                     self.script = 'filtrosDeTransformacao/escalaCinza/Sobel.py'
