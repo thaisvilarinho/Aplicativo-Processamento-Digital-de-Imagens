@@ -12,9 +12,7 @@ porcentagemProgresso = 0
 imagemResultado = 'images/imagemTransformada'
 extensaoImagemResultado = '.ppm'
 listaFiltrosUsados = []
-listaFiltrosImagensColoridas = []
-listaFiltrosImagensEscalaCinza = []
-
+listaFiltrosColoridaCinza = []
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -85,8 +83,7 @@ class MyWindow(QMainWindow):
         self.endImagemResultado = ''
 
     def criarFiltros(self):
-        global listaFiltrosImagensEscalaCinza
-        global listaFiltrosImagensColoridas
+        global listaFiltrosColoridaCinza
 
         self.correcaoGama = self.menuTransformacao.addAction("Filtro Fator &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
@@ -158,14 +155,17 @@ class MyWindow(QMainWindow):
         self.converterEscalaCinza.setCheckable(True)
         self.converterEscalaCinza.setChecked(False)
 
-        listaFiltrosImagensColoridas = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
-                                        self.filtroNegativo, self.transformacaoLogaritmica,
-                                        self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel,
-                                        self.extrairCamadaRGB, self.converterEscalaCinza]
+        self.converterPretoBranco = self.menuTransformacao.addAction("Converter Pre&to e Branco")
+        self.converterPretoBranco.setShortcut("Ctrl+Shift+T")
+        self.converterPretoBranco.triggered.connect(self.transformarImagem)
+        self.converterPretoBranco.setDisabled(True)
+        self.converterPretoBranco.setCheckable(True)
+        self.converterPretoBranco.setChecked(False)
 
-        listaFiltrosImagensEscalaCinza = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
-                                          self.filtroNegativo, self.transformacaoLogaritmica,
-                                          self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel]
+        listaFiltrosColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
+                                     self.filtroNegativo, self.transformacaoLogaritmica,
+                                     self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel,
+                                     self.extrairCamadaRGB, self.converterEscalaCinza, self.converterPretoBranco]
 
     def gerarLayouts(self):
         # Criando janela
@@ -268,8 +268,8 @@ class MyWindow(QMainWindow):
 
         if arquivoImagem:
             self.excluirCopiaTransformada()
-            porcentagemProgresso = 0
             self.removerChecagemFiltroUsado()
+            porcentagemProgresso = 0
             self.barraProgresso.setValue(porcentagemProgresso)
             self.endImagemOriginal = arquivoImagem
             self.pixmapImagem = QPixmap(self.endImagemOriginal)
@@ -387,6 +387,10 @@ class MyWindow(QMainWindow):
                     self.script = 'filtrosDeTransformacao/escalaCinza/EdgeDetection.py'
                     extensaoImagemResultado = '.pgm'
 
+                elif self.extensaoImagemOriginal == '.pbm':
+                    self.script = 'filtrosDeTransformacao/pretoBranco/EdgeDetection.py'
+                    extensaoImagemResultado = '.pbm'
+
                 self.filtroUsado = self.filtroDeteccaoDeBordas
 
             if self.filtroEscolhido == 'Filtro S&harpen':
@@ -419,7 +423,18 @@ class MyWindow(QMainWindow):
                 if self.extensaoImagemOriginal == '.ppm':
                     self.script = 'filtrosDeTransformacao/colorida/ConverterEscalaDeCinza.py'
                     extensaoImagemResultado = '.pgm'
+
                     self.filtroUsado = self.converterEscalaCinza
+
+            if self.filtroEscolhido == 'Converter Pre&to e Branco':
+                if self.extensaoImagemOriginal == '.ppm':
+                    pass
+
+                elif self.extensaoImagemOriginal == '.pgm':
+                    self.script = 'filtrosDeTransformacao/escalaCinza/Binaria.py'
+                    extensaoImagemResultado = '.pbm'
+
+                self.filtroUsado = self.converterPretoBranco
 
             self.argumentos = 'python ' + self.script + ' \"' + self.argumentoEntrada + '\" ' + \
                               imagemResultado + extensaoImagemResultado
@@ -446,21 +461,26 @@ class MyWindow(QMainWindow):
             pass
 
     def alterarVisibilidadeMenus(self):
-        global listaFiltrosImagensColoridas
-        global listaFiltrosImagensEscalaCinza
+        global listaFiltrosColoridaCinza
 
         self.opcaoInfoImagem.setVisible(True)
         self.opcaoSalvarComo.setDisabled(False)
 
         if self.extensaoImagemOriginal == '.ppm':
-            for filtro in listaFiltrosImagensColoridas:
+            for filtro in listaFiltrosColoridaCinza:
                 filtro.setDisabled(False)
 
         elif self.extensaoImagemOriginal == '.pgm':
-            for filtro in listaFiltrosImagensEscalaCinza:
+            for filtro in listaFiltrosColoridaCinza:
                     filtro.setDisabled(False)
             self.extrairCamadaRGB.setDisabled(True)
             self.converterEscalaCinza.setDisabled(True)
+
+        elif self.extensaoImagemOriginal == '.pbm':
+            for filtro in listaFiltrosColoridaCinza:
+                    filtro.setDisabled(True)
+
+            self.filtroDeteccaoDeBordas.setDisabled(False)
 
     def removerChecagemFiltroUsado(self):
         global listaFiltrosUsados
