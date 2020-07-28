@@ -13,6 +13,7 @@ imagemResultado = 'images/imagemTransformada'
 extensaoImagemResultado = '.ppm'
 listaFiltrosUsados = []
 listaFiltrosColoridaCinza = []
+listaFiltrosPretoBranco = []
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -84,6 +85,7 @@ class MyWindow(QMainWindow):
 
     def criarFiltros(self):
         global listaFiltrosColoridaCinza
+        global listaFiltrosPretoBranco
 
         self.correcaoGama = self.menuTransformacao.addAction("Filtro Fator &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
@@ -162,10 +164,19 @@ class MyWindow(QMainWindow):
         self.converterPretoBranco.setCheckable(True)
         self.converterPretoBranco.setChecked(False)
 
+        self.transformacaoMorfologica = self.menuTransformacao.addAction("&Morfológicas")
+        self.transformacaoMorfologica.setShortcut("Ctrl+Shift+M")
+        self.transformacaoMorfologica.triggered.connect(self.transformarImagem)
+        self.transformacaoMorfologica.setDisabled(True)
+        self.transformacaoMorfologica.setCheckable(True)
+        self.transformacaoMorfologica.setChecked(False)
+
         listaFiltrosColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
                                      self.filtroNegativo, self.transformacaoLogaritmica,
                                      self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel,
                                      self.extrairCamadaRGB, self.converterEscalaCinza, self.converterPretoBranco]
+
+        listaFiltrosPretoBranco =[self.filtroDeteccaoDeBordas, self.transformacaoMorfologica]
 
     def gerarLayouts(self):
         # Criando janela
@@ -436,6 +447,13 @@ class MyWindow(QMainWindow):
 
                 self.filtroUsado = self.converterPretoBranco
 
+            if self.filtroEscolhido == '&Morfológicas':
+                if self.extensaoImagemOriginal == '.pbm':
+                    self.script = 'filtrosDeTransformacao/pretoBranco/Erosao.py'
+                    extensaoImagemResultado = '.pbm'
+
+                self.filtroUsado = self.transformacaoMorfologica
+
             self.argumentos = 'python ' + self.script + ' \"' + self.argumentoEntrada + '\" ' + \
                               imagemResultado + extensaoImagemResultado
             self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
@@ -481,6 +499,7 @@ class MyWindow(QMainWindow):
                     filtro.setDisabled(True)
 
             self.filtroDeteccaoDeBordas.setDisabled(False)
+            self.transformacaoMorfologica.setDisabled(False)
 
     def removerChecagemFiltroUsado(self):
         global listaFiltrosUsados
