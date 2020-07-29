@@ -12,8 +12,7 @@ porcentagemProgresso = 0
 imagemResultado = 'imagensResultado/imagemTransformada'
 extensaoImagemResultado = '.ppm'
 listaFiltrosUsados = []
-listaFiltrosColoridaCinza = []
-listaFiltrosPretoBranco = []
+
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -24,10 +23,12 @@ class MyWindow(QMainWindow):
         self.initUI()
         self.show()
 
+    '''Chamar métodos que criam a interface'''
     def initUI(self):
         self.criarWidgets()
         self.gerarLayouts()
 
+    '''Cria os widgets que encorporam o Menu e widgets que executaram ações'''
     def criarWidgets(self):
         # Criar a barra de menu
         self.barraMenu = self.menuBar()
@@ -39,7 +40,7 @@ class MyWindow(QMainWindow):
 
         # Crias as actions
         self.opcaoAbrir = self.menuArquivo.addAction("A&brir")
-        self.opcaoAbrir.triggered.connect(self.abrirArquivo)
+        self.opcaoAbrir.triggered.connect(self.abrirImagem)
         self.opcaoAbrir.setShortcut("Ctrl+A")
 
         self.opcaoRecente = self.menuArquivo.addMenu("Abrir &Recente")
@@ -47,7 +48,7 @@ class MyWindow(QMainWindow):
         self.abrirRecente.setDisabled(True)
 
         self.opcaoSalvarComo = self.menuArquivo.addAction("&Salvar como")
-        self.opcaoSalvarComo.triggered.connect(self.salvarAquivoComo)
+        self.opcaoSalvarComo.triggered.connect(self.salvarImagemComo)
         self.opcaoSalvarComo.setShortcut("Ctrl+S")
         self.opcaoSalvarComo.setDisabled(True)
 
@@ -56,7 +57,7 @@ class MyWindow(QMainWindow):
         self.opcaoFechar.setShortcut("Ctrl+X")
         self.opcaoFechar.triggered.connect(self.close)
 
-        self.criarFiltros()
+        self.gerarListasFiltros()
 
         self.opcaoSobre = self.menuSobre.addAction("S&obre o Aplicativo")
         self.opcaoSobre.triggered.connect(self.mostrarInformacoesSobre)
@@ -83,18 +84,39 @@ class MyWindow(QMainWindow):
         self.endImagemOriginal = ''
         self.endImagemResultado = ''
 
-    def criarFiltros(self):
-        global listaFiltrosColoridaCinza
-        global listaFiltrosPretoBranco
+    def gerarListasFiltros(self):
 
+        self.criarActionCorrecaoGama()
+        self.criarActionFiltroGaussiano()
+        self.criarActionFiltroMediana()
+        self.criarActionFiltroNegativo()
+        self.criarActionTransformacaoLogaritmica()
+        self.criarActionFiltroDeteccaoDeBordas()
+        self.criarActionFiltroSharpen()
+        self.criarActionFiltroSobel()
+        self.criarActionExtrairCamadaRGB()
+        self.criarActionConverterEscalaCinza()
+        self.criarActionConverterPretoBranco()
+        self.criarActionTransformacaoMorfologica()
+
+        self.listaFiltrosColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
+                                     self.filtroNegativo, self.transformacaoLogaritmica,
+                                     self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel,
+                                     self.extrairCamadaRGB, self.converterEscalaCinza, self.converterPretoBranco]
+
+        self.listaFiltrosPretoBranco = [self.filtroDeteccaoDeBordas, self.transformacaoMorfologica]
+
+    def criarActionCorrecaoGama(self):
         self.correcaoGama = self.menuTransformacao.addAction("Filtro Correção &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
         self.correcaoGama.setDisabled(True)
         self.correcaoGama.setCheckable(True)
         self.correcaoGama.setChecked(False)
         self.correcaoGama.triggered.connect(lambda:
-            self.transformarImagem(self.correcaoGama, 'CorrecaoGama', self.extensaoImagemOriginal))
+                                            self.transformarImagem(self.correcaoGama, 'CorrecaoGama',
+                                                                   self.extensaoImagemOriginal))
 
+    def criarActionFiltroGaussiano(self):
         self.filtroGaussiano = self.menuTransformacao.addAction("Filtro Ga&ussiano")
         self.filtroGaussiano.setShortcut("Ctrl+Shift+U")
         self.filtroGaussiano.setDisabled(True)
@@ -102,6 +124,8 @@ class MyWindow(QMainWindow):
         self.filtroGaussiano.setChecked(False)
         self.filtroGaussiano.triggered.connect(
             lambda: self.transformarImagem(self.filtroGaussiano, 'Gaussiano3x3', self.extensaoImagemOriginal))
+
+    def criarActionFiltroMediana(self):
 
         self.filtroMediana = self.menuTransformacao.addAction("Filtro &Mediana")
         self.filtroMediana.setShortcut("Ctrl+Shift+M")
@@ -111,6 +135,7 @@ class MyWindow(QMainWindow):
         self.filtroMediana.triggered.connect(
             lambda: self.transformarImagem(self.filtroMediana, 'Mediana', self.extensaoImagemOriginal))
 
+    def criarActionFiltroNegativo(self):
         self.filtroNegativo = self.menuTransformacao.addAction("Filtro &Negativo")
         self.filtroNegativo.setShortcut("Ctrl+Shift+N")
         self.filtroNegativo.setDisabled(True)
@@ -119,6 +144,7 @@ class MyWindow(QMainWindow):
         self.filtroNegativo.triggered.connect(
             lambda: self.transformarImagem(self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal))
 
+    def criarActionTransformacaoLogaritmica(self):
         self.transformacaoLogaritmica = self.menuTransformacao.addAction("Transformação &Logarítmica")
         self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
         self.transformacaoLogaritmica.setDisabled(True)
@@ -128,6 +154,7 @@ class MyWindow(QMainWindow):
             lambda: self.transformarImagem(self.transformacaoLogaritmica, 'TransformacaoLogaritmica',
                                    self.extensaoImagemOriginal))
 
+    def criarActionFiltroDeteccaoDeBordas(self):
         self.filtroDeteccaoDeBordas = self.menuTransformacao.addAction("Filtros &Detecção de Bordas")
         self.filtroDeteccaoDeBordas.setShortcut("Ctrl+Shift+D")
         self.filtroDeteccaoDeBordas.setDisabled(True)
@@ -136,6 +163,7 @@ class MyWindow(QMainWindow):
         self.filtroDeteccaoDeBordas.triggered.connect(
             lambda: self.transformarImagem(self.filtroDeteccaoDeBordas, 'EdgeDetection', self.extensaoImagemOriginal))
 
+    def criarActionFiltroSharpen(self):
         self.filtroSharpen = self.menuTransformacao.addAction("Filtro S&harpen")
         self.filtroSharpen.setShortcut("Ctrl+Shift+H")
         self.filtroSharpen.setDisabled(True)
@@ -144,6 +172,7 @@ class MyWindow(QMainWindow):
         self.filtroSharpen.triggered.connect(
             lambda: self.transformarImagem(self.filtroSharpen, 'Sharpen', self.extensaoImagemOriginal))
 
+    def criarActionFiltroSobel(self):
         self.filtroSobel = self.menuTransformacao.addAction("Filtro S&obel")
         self.filtroSobel.setShortcut("Ctrl+Shift+O")
         self.filtroSobel.setDisabled(True)
@@ -152,6 +181,7 @@ class MyWindow(QMainWindow):
         self.filtroSobel.triggered.connect(
             lambda: self.transformarImagem(self.filtroSobel, 'Sobel', self.extensaoImagemOriginal))
 
+    def criarActionExtrairCamadaRGB(self):
         self.extrairCamadaRGB = self.menuTransformacao.addAction("Extrair &Camadas RGB")
         self.extrairCamadaRGB.setShortcut("Ctrl+Shift+C")
         self.extrairCamadaRGB.setDisabled(True)
@@ -160,6 +190,7 @@ class MyWindow(QMainWindow):
         self.extrairCamadaRGB.triggered.connect(
             lambda: self.transformarImagem(self.extrairCamadaRGB, 'CamadaR', '.ppm'))
 
+    def criarActionConverterEscalaCinza(self):
         self.converterEscalaCinza = self.menuTransformacao.addAction("Converter para Escala de C&inza")
         self.converterEscalaCinza.setShortcut("Ctrl+Shift+I")
         self.converterEscalaCinza.setDisabled(True)
@@ -168,6 +199,7 @@ class MyWindow(QMainWindow):
         self.converterEscalaCinza.triggered.connect(
             lambda: self.transformarImagem(self.converterEscalaCinza, 'ConverterEscalaDeCinza', '.pgm'))
 
+    def criarActionConverterPretoBranco(self):
         self.converterPretoBranco = self.menuTransformacao.addAction("Converter Pre&to e Branco")
         self.converterPretoBranco.setShortcut("Ctrl+Shift+T")
         self.converterPretoBranco.setDisabled(True)
@@ -176,6 +208,7 @@ class MyWindow(QMainWindow):
         self.converterPretoBranco.triggered.connect(
             lambda: self.transformarImagem(self.converterPretoBranco, 'Binaria', '.pbm'))
 
+    def criarActionTransformacaoMorfologica(self):
         self.transformacaoMorfologica = self.menuTransformacao.addAction("&Morfológicas")
         self.transformacaoMorfologica.setShortcut("Ctrl+Shift+M")
         self.transformacaoMorfologica.setDisabled(True)
@@ -183,13 +216,6 @@ class MyWindow(QMainWindow):
         self.transformacaoMorfologica.setChecked(False)
         self.transformacaoMorfologica.triggered.connect(
             lambda: self.transformarImagem(self.transformacaoMorfologica, 'Erosao', '.pbm'))
-
-        listaFiltrosColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.filtroMediana,
-                                     self.filtroNegativo, self.transformacaoLogaritmica,
-                                     self.filtroDeteccaoDeBordas, self.filtroSharpen, self.filtroSobel,
-                                     self.extrairCamadaRGB, self.converterEscalaCinza, self.converterPretoBranco]
-
-        listaFiltrosPretoBranco = [self.filtroDeteccaoDeBordas, self.transformacaoMorfologica]
 
     def gerarLayouts(self):
         # Criando janela
@@ -212,6 +238,7 @@ class MyWindow(QMainWindow):
 
         self.janelaAreaVisualizacao.setLayout(self.layoutPrincipal)
 
+    '''Exibe informações sobre aplicativo e imagem quando selecionado menu Sobre'''
     def mostrarInformacoesSobre(self):
 
         self.opcaoEscolhida = self.sender().text()
@@ -234,7 +261,7 @@ class MyWindow(QMainWindow):
             if self.endImagemOriginal != '':
                 self.caixaMensagem.setWindowTitle("Informações da Imagem")
 
-                self.informacoesDaImagem()
+                self.extrairInfoImagem()
 
                 self.caixaMensagem.setText("Arquivo: " + self.nomeimagem + "\n" + "Tipo: " + self.tipoimagem +
                                            "Comentário: " + self.comentarioimagem + "Largura: " + self.larguraimagem \
@@ -242,7 +269,9 @@ class MyWindow(QMainWindow):
 
                 self.caixaMensagem.exec_()
 
-    def salvarAquivoComo(self):
+    '''Salva Cópia de Imagem com nome de arquivo e diretório escolhidos pelo usuário, depois de verificar se existe
+    uma imagem carregada'''
+    def salvarImagemComo(self):
         global extensaoImagemResultado
         try:
             if self.endImagemOriginal != '':
@@ -264,7 +293,11 @@ class MyWindow(QMainWindow):
         except:
             pass
 
-    def abrirArquivo(self):
+    '''Solicita ocultação de diretório com cópias de imagens transformadas.Ao abrir imagem selecionada pelo usuário,
+    solicita execução de métodos para remover cópias anteriores de imagens transformadas, remoção de marcação de 
+    filtros checados, zera porcentagem da barra de progresso, atribui endereço da imagem escolhida no pixmap da imagem 
+    que será exibida e solicita método que habilita visibilidade dos menus de fitros'''
+    def abrirImagem(self):
         global imagemResultado
 
         self.ocultarDiretorioImgResultado()
@@ -276,8 +309,8 @@ class MyWindow(QMainWindow):
                                                        initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
 
         if arquivoImagem:
-            self.excluirCopiaTransformada()
-            self.removerChecagemFiltroUsado()
+            self.excluirCopiaImgTransformada()
+            self.removerChecagemFiltrosUsados()
             porcentagemProgresso = 0
             self.barraProgresso.setValue(porcentagemProgresso)
             self.endImagemOriginal = arquivoImagem
@@ -286,7 +319,7 @@ class MyWindow(QMainWindow):
             self.exibirImagem()
             self.alterarVisibilidadeMenus()
 
-    def informacoesDaImagem(self):
+    def extrairInfoImagem(self):
         try:
             self.parts = self.endImagemOriginal.rpartition('/')
             self.nomeimagem = self.parts[2]
@@ -300,6 +333,8 @@ class MyWindow(QMainWindow):
         except:
             pass
 
+    '''Realiza aplicação de filtros e transformações nas imagens repassando argumentos para scripts externos serem 
+    executados, controlando valores apresentados na barra de Progresso e de Status'''
     def transformarImagem(self, filtro, script, extensao):
 
         global porcentagemProgresso
@@ -365,7 +400,7 @@ class MyWindow(QMainWindow):
         self.imagemOriginal.setPixmap(self.pixmapImagem)
         self.imagemOriginal.setAlignment(QtCore.Qt.AlignCenter)
 
-    def excluirCopiaTransformada(self):
+    def excluirCopiaImgTransformada(self):
         global imagemResultado
         try:
             if os.path.exists(imagemResultado + "Copia" + '.ppm') or os.path.exists(imagemResultado + '.ppm'):
@@ -383,29 +418,30 @@ class MyWindow(QMainWindow):
             pass
 
     def alterarVisibilidadeMenus(self):
-        global listaFiltrosColoridaCinza
 
         self.opcaoInfoImagem.setVisible(True)
         self.opcaoSalvarComo.setDisabled(False)
 
         if self.extensaoImagemOriginal == '.ppm':
-            for filtro in listaFiltrosColoridaCinza:
+            for filtro in self.listaFiltrosColoridaCinza:
                 filtro.setDisabled(False)
+            self.transformacaoMorfologica.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pgm':
-            for filtro in listaFiltrosColoridaCinza:
+            for filtro in self.listaFiltrosColoridaCinza:
                     filtro.setDisabled(False)
             self.extrairCamadaRGB.setDisabled(True)
             self.converterEscalaCinza.setDisabled(True)
+            self.transformacaoMorfologica.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pbm':
-            for filtro in listaFiltrosColoridaCinza:
+            for filtro in self.listaFiltrosColoridaCinza:
                     filtro.setDisabled(True)
 
             self.filtroDeteccaoDeBordas.setDisabled(False)
             self.transformacaoMorfologica.setDisabled(False)
 
-    def removerChecagemFiltroUsado(self):
+    def removerChecagemFiltrosUsados(self):
         global listaFiltrosUsados
         for filtro in listaFiltrosUsados:
             filtro.setChecked(False)
@@ -415,9 +451,10 @@ class MyWindow(QMainWindow):
     def ocultarDiretorioImgResultado(self):
         os.system("attrib +h " + 'imagensResultado')
 
+    '''Excluir imagens cópias ao finalizar aplicativo'''
     def closeEvent(self, event):
         global listaFiltrosUsados
-        self.excluirCopiaTransformada()
+        self.excluirCopiaImgTransformada()
 
 
 def main():
