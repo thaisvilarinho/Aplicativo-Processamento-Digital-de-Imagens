@@ -23,18 +23,22 @@ def receberArquivos():
     imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0], 3])
     imagem = imagem.astype(int)
 
-    #Matrizes filtro Sobel
-    kernelx = [[-1, 0, 1], [2, 0, -2], [1, 0, -1]]
-    kernelx = np.asarray(kernelx)
-    kernely = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
-    kernely = np.asarray(kernely)
-    ks = int((len(kernelx)-1)/2)
-    threshold = 200
+    # Edge Detection
+    #kernel = [[1, 0, -1], [0, 0, 0], [-1, 0, 1]]
+    #kernel = np.asarray(kernel)
 
-    gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely, ks, threshold)
+    # kernel = [[0, 1, 0], [1, -4, 1], [0, 1, 0]]
+    # kernel = np.asarray(kernel)
+
+    kernel = [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]]
+    kernel = np.asarray(kernel)
+
+    ks = int((len(kernel) - 1) / 2)
+
+    gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks)
 
 
-def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely, ks, threshold):
+def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks):
 
     # escrevendo a imagem resultado
     saida.write('P3\n')
@@ -51,16 +55,11 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely,
     for i in range(ks, len(imagem)-ks):
         for j in range(ks, len(imagem[1])-ks):
             for k in range(3):
-                sumx = 0
-                sumy = 0
-                for ki in range(len(kernelx)):
-                    for kj in range(len(kernelx[1])):
-                        sumx = sumx + (imagem[i-ks+ki][j-ks+kj][k]*kernelx[ki][kj])
-                        sumy = sumy + (imagem[i-ks+ki][j-ks+kj][k]*kernely[ki][kj])
-                sumxy = math.sqrt((sumx**2)+(sumy**2))
-                #Threshold
-                sum = max(sumxy, threshold)
-                sum = int(sum) if sum != threshold else 0
+                sum = 0
+                for ki in range(len(kernel)):
+                    for kj in range(len(kernel[1])):
+                        sum = sum + (imagem[i - ks + ki][j - ks + kj][k] * kernel[ki][kj])
+                sum = int(sum)
                 sum = str(sum)
                 saida.write(sum)
                 saida.write("\n")

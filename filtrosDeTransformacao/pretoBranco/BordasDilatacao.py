@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# *-* coding: utf:8 -*-
 
 import sys
 import numpy as np
@@ -8,6 +8,7 @@ if __name__ == "__main__":
     print(f'Quantos argumentos: {len(sys.argv)}')
     for i, arg in enumerate(sys.argv):
         print(f'Argument:{i}: {arg}')
+
 
 # Abrir os arquivos de entrada e de saída
 entrada = open(sys.argv[1], "r+")
@@ -31,33 +32,31 @@ def concatenate_list_data(list):
         result += str(element)
     return result
 
-
 longstring = concatenate_list_data(linhas)
 image = np.array(list(longstring))
 image = np.reshape(image, [dimensoes[1], dimensoes[0]])
 image = image.astype(int)
 
+
 #Elemento Estruturante 3x3
-#elemento = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
+#elemento = [[0, 0, 0], [0, 1, 1], [0, 0, 0]]
+
 
 #Elemento Estruturante 5x5
-#elemento = [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]]
+#elemento = [[1, 0, 0, 0, 1], [1, 1, 1, 1, 1], [1, 0, 0, 1, 1], [0, 1, 1, 0, 0], [1, 0, 1, 1, 1]]
 
 
 #Elemento Estruturante 7x7
-#elemento = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],
-#            [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
+#elemento = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
 
 #Elemento Estruturante 9x9
-elemento = [[1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1]]
-
+elemento = [[1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 0, 0, 0, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 0, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 0, 1], [1, 0, 1, 0, 1, 1, 1, 1, 1],
+            [0, 0, 0, 1, 1, 0, 0, 1, 1], [1, 0, 1, 0, 1, 1, 0, 1, 1], [1, 0, 0, 1, 0, 1, 1, 1, 1]]
 
 
 #Array numpy do elemento estruturante
 elemento = np.asarray(elemento)
-
 
 #Pegar pixel posição pixel central
 es = int((len(elemento) - 1) / 2)
@@ -73,31 +72,23 @@ saida.write("\n")
 
 #Fazer cópia da imagem original
 image2 = image.copy()
-
-# fazer erosão
-for px in range(es, len(image)-es):
-    for py in range(es, len(image[1])-es):
-        if image[px][py] == 0:
-            for ex in range(len(elemento)):
-                for ey in range(len(elemento[1])):
-                    if elemento[ex][ey] == 1:
-                        image2[px - es + ex][py - es + ey] = 0
-
-#Fazer cópia da imagem erodida
+# Fazer cópia que será a imagem resultante
 image3 = image2.copy()
 
-#Fazer a dilatação
-for px in range(es, len(image2)-es):
-    for py in range(es, len(image2[1])-es):
-        if image2[px][py] == 1:
+# Transformação morfológica Dilatação
+for px in range(es, len(image)-es):
+    for py in range(es, len(image[1])-es):
+        if image[px][py] == 1:
             for ex in range(len(elemento)):
                 for ey in range(len(elemento[1])):
                     if elemento[ex][ey] == 1:
-                        image3[px - es + ex][py - es + ey] = 1
+                        image2[px - es + ex][py - es + ey] = 1
 
-#Escrevendo o resultado da abertura
-for linha in range(len(image3)):
-    for coluna in range(len(image3[1])):
+
+
+for linha in range(len(image2)):
+    for coluna in range(len(image2[1])):
+        image3[linha][coluna] = image2[linha][coluna] - image[linha][coluna]
         saida.write(str(image3[linha][coluna]))
     saida.write("\n")
 

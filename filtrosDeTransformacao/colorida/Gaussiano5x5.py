@@ -3,6 +3,7 @@
 import sys
 import numpy as np
 
+
 def receberArquivos():
 
     # Abrir os arquivos de entrada e de saída
@@ -22,9 +23,10 @@ def receberArquivos():
     imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0], 3])
     imagem = imagem.astype(int)
 
-    # Matriz filtro Sharpen
-    kernel = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
-    kernel = np.asarray(kernel)
+    # Matriz Filtro Gaussiano 5x5
+    kernel = [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]]
+    kernel = np.asarray(kernel)/273
+
     ks = int((len(kernel) - 1) / 2)
 
     gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks)
@@ -42,7 +44,7 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks):
     saida.write('\n')
     saida.write('255\n')
 
-    # aplicar filtro Sharpen
+    # aplicar filtro gaussiano na imagem
     for i in range(ks, len(imagem)-ks):
         for j in range(ks, len(imagem[1])-ks):
             for k in range(3):

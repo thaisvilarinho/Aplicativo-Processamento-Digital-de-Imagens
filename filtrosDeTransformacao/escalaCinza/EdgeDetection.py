@@ -40,8 +40,6 @@ kernel = np.asarray(kernel)
 #kernel = [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]]
 #kernel = np.asarray(kernel)
 
-print(kernel)
-
 ks = int((len(kernel) - 1) / 2)
 
 #escrevendo a imagem cópia

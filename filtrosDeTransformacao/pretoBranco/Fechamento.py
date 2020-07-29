@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
+
+import sys
 import numpy as np
 
-entrada = open("star.pbm", "r+")
-saida = open("star_fechamento_3x3.pbm", "w+")
+# Checando os argumentos de linha de comando
+if __name__ == "__main__":
+    print(f'Quantos argumentos: {len(sys.argv)}')
+    for i, arg in enumerate(sys.argv):
+        print(f'Argument:{i}: {arg}')
+
+# Abrir os arquivos de entrada e de saída
+entrada = open(sys.argv[1], "r+")
+saida = open(sys.argv[2], "w+")
 
 linha = entrada.readline() # P1
 linha = entrada.readline() # Comentário
@@ -10,10 +19,10 @@ linha = entrada.readline() # Dimensões da imagem
 dimensoes = linha.split() # Lista com as dimensões
 largura = int(dimensoes[0])
 altura = int(dimensoes[1])
-dimensoes = np.asarray(dimensoes, dtype=int) # Converte a lista para um array
+dimensoes = np.asarray(dimensoes, dtype=int)
 
-linhas = entrada.readlines() # lê todo o restante do arquivo
-linhas = [x.strip() for x in linhas] # remove o \n do final de todas as linhas
+linhas = entrada.readlines()
+linhas = [x.strip() for x in linhas]
 
 
 def concatenate_list_data(list):
@@ -23,22 +32,10 @@ def concatenate_list_data(list):
     return result
 
 
-#concatena todos os elementos em uma única string
 longstring = concatenate_list_data(linhas)
-#converte a string longa para um array de uma dimensão
 image = np.array(list(longstring))
-#muda a forma do array de [altura*largura, 1] para [altura, largura]
 image = np.reshape(image, [dimensoes[1], dimensoes[0]])
-#converte a matriz para inteiro
 image = image.astype(int)
-
-'''
-image agora é um array de [altura, largura] e pode ser  usado nas estruturas de repetição 
-como nos outros códigos (ppm e pgm).
-'''
-#print(image)
-#print(image.shape)
-
 
 #Elemento Estruturante 3x3
 elemento = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
@@ -58,14 +55,11 @@ elemento = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
 #            [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
 
-
 #Array numpy do elemento estruturante
 elemento = np.asarray(elemento)
 
-
 #Pegar pixel posição pixel central
 es = int((len(elemento) - 1) / 2)
-
 
 #escrevendo a imagem cópia
 saida.write("P1\n")
@@ -88,8 +82,6 @@ for px in range(es, len(image)-es):
                     if elemento[ex][ey] == 1:
                         image2[px - es + ex][py - es + ey] = 1
 
-print(image2)
-print("\n")
 
 #Fazer cópia da imagem dilatada
 image3 = image2.copy()
@@ -103,7 +95,6 @@ for px in range(es, len(image2)-es):
                     if elemento[ex][ey] == 1:
                         image3[px - es + ex][py - es + ey] = 0
 
-print(image3)
 
 for linha in range(len(image3)):
     for coluna in range(len(image3[1])):
