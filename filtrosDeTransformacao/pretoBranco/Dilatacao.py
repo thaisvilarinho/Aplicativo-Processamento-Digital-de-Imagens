@@ -31,8 +31,6 @@ def concatenate_list_data(list):
         result += str(element)
     return result
 
-
-
 longstring = concatenate_list_data(linhas)
 image = np.array(list(longstring))
 image = np.reshape(image, [dimensoes[1], dimensoes[0]])
@@ -64,7 +62,6 @@ elemento = np.asarray(elemento)
 #Pegar pixel posição pixel central
 es = int((len(elemento) - 1) / 2)
 
-
 #escrevendo a imagem cópia
 saida.write("P1\n")
 saida.write("#Criado por Thais\n")
@@ -74,7 +71,7 @@ saida.write(str(altura))
 saida.write("\n")
 
 
-#Fazer cópia da imagem original
+# Transformação morfológica Dilatação
 image2 = image.copy()
 
 for px in range(es, len(image)-es):
@@ -85,7 +82,6 @@ for px in range(es, len(image)-es):
                     if elemento[ex][ey] == 1:
                         image2[px - es + ex][py - es + ey] = 1
 
-print(image2)
 
 for linha in range(len(image2)):
     for coluna in range(len(image2[1])):
