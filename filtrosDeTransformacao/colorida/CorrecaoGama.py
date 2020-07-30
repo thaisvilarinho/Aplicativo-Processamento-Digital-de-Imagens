@@ -3,18 +3,10 @@
 import sys
 import numpy as np
 
-# Checando os argumentos de linha de comando
-if __name__ == "__main__":
-    print(f'Quantos argumentos: {len(sys.argv)}')
-    for i, arg in enumerate(sys.argv):
-        print(f'Argument:{i}: {arg}')
 
-def receberArquivos():
-    # Abrir os arquivos de entrada e de saída
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
-    saida = open(sys.argv[2], "w+")
 
-    # Fazer o Processamento Digital de Imagens
     linha = entrada.readline()  # Tipo
     linha = entrada.readline()  # Comentário
     linha = entrada.readline()  # Dimensões
@@ -27,11 +19,11 @@ def receberArquivos():
     imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0], 3])
     imagem = imagem.astype(int)
 
-    gerarImagemTransformada(entrada, saida, dimensoes, imagem)
+    escreverImagemSaida(entrada, dimensoes, imagem)
 
 
-def gerarImagemTransformada(entrada, saida, dimensoes, imagem):
-    # escrevendo a imagem resultado
+def escreverImagemSaida(entrada, dimensoes, imagem):
+    saida = open(sys.argv[2], "w+")
     saida.write("P3\n")
     saida.write("#Criado por Thais\n")
     largura = dimensoes[0]
@@ -41,7 +33,7 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem):
     saida.write(str(altura))
     saida.write("\n")
     saida.write("255\n")
-    # fator gamma
+    # valor fator gamma
     gamma = float(sys.argv[3])
 
     # calcular a correção gama sobre a imagem
@@ -59,4 +51,4 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem):
 
 
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()

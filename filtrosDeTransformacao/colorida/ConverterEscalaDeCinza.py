@@ -4,29 +4,27 @@ import sys
 import numpy as np
 
 
-def receberArquivos():
-    # Abrir os arquivos de entrada e de saída
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
-    saida = open(sys.argv[2], "w+")
 
-    linha = entrada.readline() # Tipo
-    linha = entrada.readline() # Comentário
-    linha = entrada.readline() # Dimensões
+    linha = entrada.readline()  # Tipo
+    linha = entrada.readline()  # Comentário
+    linha = entrada.readline()  # Dimensões
     dimensoes = linha.split()
     largura = int(dimensoes[0])
     altura = int(dimensoes[1])
-    linha = entrada.readline() # Valor fixo
+    linha = entrada.readline()  # Valor fixo
     linha = entrada.readlines()
 
-    #converter de lista para array
+    # converter de lista para array
     imagem = np.asarray(linha, dtype=int)
     imagem = np.reshape(imagem, (altura, largura, 3))
 
-    gerarImagemTransformada(entrada, saida, largura, altura, imagem)
+    escreverImagemSaida(entrada, largura, altura, imagem)
 
 
-def gerarImagemTransformada(entrada, saida, largura, altura, imagem):
-    # escrevendo a imagem resultado
+def escreverImagemSaida(entrada, largura, altura, imagem):
+    saida = open(sys.argv[2], "w+")
     saida.write("P2\n")
     saida.write("#Criado por Thais\n")
     saida.write(str(largura))
@@ -50,5 +48,6 @@ def gerarImagemTransformada(entrada, saida, largura, altura, imagem):
     entrada.close()
     saida.close()
 
+
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()

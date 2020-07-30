@@ -4,10 +4,8 @@ import sys
 import numpy as np
 
 
-def receberArquivos():
-    # Abrir os arquivos de entrada e de saída
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
-    saida = open(sys.argv[2], "w+")
 
     linha = entrada.readline() # Tipo
     linha = entrada.readline() # Comentário
@@ -18,7 +16,6 @@ def receberArquivos():
     linha = entrada.readline() # Valor fixo
     linha = entrada.readlines()
 
-    #converter de lista para array
     imagem = np.asarray(linha, dtype=int)
     imagem = np.reshape(imagem, (altura, largura, 3))
     linhas = converterParaEscalaDeCinza(imagem)
@@ -26,12 +23,12 @@ def receberArquivos():
     imagem = np.asarray(linhas, dtype=int)
     imagem = np.reshape(imagem, (altura, largura))
 
-    gerarImagemTransformada(entrada, saida, largura, altura, imagem)
+    escreverImagemSaida(entrada, largura, altura, imagem)
 
 def converterParaEscalaDeCinza(imagem):
     linhas = []
 
-    #converter pixels coloridos para escala de cinza
+    # converter pixels coloridos para escala de cinza
     for i in range(len(imagem)):
         for j in range(len(imagem[1])):
             sum = 0
@@ -43,9 +40,8 @@ def converterParaEscalaDeCinza(imagem):
     return linhas
 
 
-def gerarImagemTransformada(entrada, saida, largura, altura, imagem):
-
-    #escrevendo a imagem cópia
+def escreverImagemSaida(entrada, largura, altura, imagem):
+    saida = open(sys.argv[2], "w+")
     saida.write("P1\n")
     saida.write("#Criado por Thais\n")
     saida.write(str(largura))
@@ -63,10 +59,10 @@ def gerarImagemTransformada(entrada, saida, largura, altura, imagem):
                 saida.write("1")
             saida.write("\n")
 
-    #fechar os dois arquivos.
+    # fechar os arquivos
     entrada.close()
     saida.close()
 
 
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()
