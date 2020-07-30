@@ -4,13 +4,10 @@ import sys
 import numpy as np
 import math
 
-def receberArquivos():
 
-    # Abrir os arquivos de entrada e de saída
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
-    saida = open(sys.argv[2], "w+")
 
-    # Fazer o Processamento Digital de Imagens
     linha = entrada.readline()  # Tipo
     linha = entrada.readline()  # Comentário
     linha = entrada.readline()  # Dimensões
@@ -23,20 +20,19 @@ def receberArquivos():
     imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0], 3])
     imagem = imagem.astype(int)
 
-    #Matrizes filtro Sobel
+    # Matrizes filtro Sobel
     kernelx = [[-1, 0, 1], [2, 0, -2], [1, 0, -1]]
     kernelx = np.asarray(kernelx)
     kernely = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
     kernely = np.asarray(kernely)
-    ks = int((len(kernelx)-1)/2)
+    ks = int((len(kernelx) - 1) / 2)
     threshold = 200
 
-    gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely, ks, threshold)
+    escreverImagemSaida(entrada, dimensoes, imagem, kernelx, kernely, ks, threshold)
 
 
-def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely, ks, threshold):
-
-    # escrevendo a imagem resultado
+def escreverImagemSaida(entrada, dimensoes, imagem, kernelx, kernely, ks, threshold):
+    saida = open(sys.argv[2], "w+")
     saida.write('P3\n')
     saida.write('#Criado por Thais\n')
     largura = dimensoes[0]
@@ -47,28 +43,28 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernelx, kernely,
     saida.write('\n')
     saida.write('255\n')
 
-    #fazer a transformação
-    for i in range(ks, len(imagem)-ks):
-        for j in range(ks, len(imagem[1])-ks):
+    # aplicar filtro sobel
+    for i in range(ks, len(imagem) - ks):
+        for j in range(ks, len(imagem[1]) - ks):
             for k in range(3):
                 sumx = 0
                 sumy = 0
                 for ki in range(len(kernelx)):
                     for kj in range(len(kernelx[1])):
-                        sumx = sumx + (imagem[i-ks+ki][j-ks+kj][k]*kernelx[ki][kj])
-                        sumy = sumy + (imagem[i-ks+ki][j-ks+kj][k]*kernely[ki][kj])
-                sumxy = math.sqrt((sumx**2)+(sumy**2))
-                #Threshold
+                        sumx = sumx + (imagem[i - ks + ki][j - ks + kj][k] * kernelx[ki][kj])
+                        sumy = sumy + (imagem[i - ks + ki][j - ks + kj][k] * kernely[ki][kj])
+                sumxy = math.sqrt((sumx ** 2) + (sumy ** 2))
+                # aplicando valor Threshold escolhido pelo usuário
                 sum = max(sumxy, threshold)
                 sum = int(sum) if sum != threshold else 0
                 sum = str(sum)
                 saida.write(sum)
                 saida.write("\n")
 
-    #fechar os arquivos
+    # fechar os arquivos
     entrada.close()
     saida.close()
 
 
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()

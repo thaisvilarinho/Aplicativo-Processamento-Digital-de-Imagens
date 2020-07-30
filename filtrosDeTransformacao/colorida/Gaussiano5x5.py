@@ -4,13 +4,9 @@ import sys
 import numpy as np
 
 
-def receberArquivos():
-
-    # Abrir os arquivos de entrada e de saída
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
-    saida = open(sys.argv[2], "w+")
 
-    # Fazer o Processamento Digital de Imagens
     linha = entrada.readline() # Tipo
     linha = entrada.readline() # Comentário
     linha = entrada.readline() # Dimensões
@@ -29,11 +25,11 @@ def receberArquivos():
 
     ks = int((len(kernel) - 1) / 2)
 
-    gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks)
+    escreverImagemSaida(entrada, dimensoes, imagem, kernel, ks)
 
 
-def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks):
-    # escrevendo a imagem resultado
+def escreverImagemSaida(entrada, dimensoes, imagem, kernel, ks):
+    saida = open(sys.argv[2], "w+")
     saida.write('P3\n')
     saida.write('#Criado por Thais\n')
     largura = dimensoes[0]
@@ -57,10 +53,10 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem, kernel, ks):
                 saida.write(sum)
                 saida.write("\n")
 
-    #fechar os arquivos
+    # fechar os arquivos
     entrada.close()
     saida.close()
 
 
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()

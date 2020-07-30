@@ -114,20 +114,19 @@ class MyWindow(QMainWindow):
 
     '''Utiliza métodos para criar Actions dos Menus e criar Listas para controlar marcação 
     de checagem de filtros usados'''
-
     def gerarActionsEListas(self):
 
+        self.criarActionConverterParaEscalaCinza()
+        self.criarActionConverterParaPretoBranco()
         self.criarActionCorrecaoGama()
+        self.criarActionDecomposicaoCanaisRGB()
         self.criarActionFiltroGaussiano()
         self.criarActionFiltroMediana()
         self.criarActionFiltroNegativo()
-        self.criarActionTransformacaoLogaritmica()
-        self.criarActionFiltrosDeteccaoDeBordas()
         self.criarActionFiltroSharpen()
         self.criarActionFiltroSobel()
-        self.criarActionDecomporCanaisRGB()
-        self.criarActionConverterPretoBranco()
-        self.criarActionConverterEscalaCinza()
+        self.criarActionFiltrosDeteccaoDeBordas()
+        self.criarActionTransformacaoLogaritmica()
         self.criarActionTransformacaoMorfologica()
 
         self.listaFiltrosImgColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.kernelGaussiano3x3,
@@ -135,21 +134,66 @@ class MyWindow(QMainWindow):
                                              self.filtroNegativo, self.transformacaoLogaritmica,
                                              self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
                                              self.deteccaoDeBordasFiltroBeta, self.deteccaoDeBordasFiltroZeta,
-                                             self.filtroSharpen, self.filtroSobel, self.decomporCanaisRGB,
+                                             self.filtroSharpen, self.filtroSobel, self.decomposicaoCanaisRGB,
                                              self.decomporCanalR, self.decomporCanalG, self.decomporCanalB,
-                                             self.converterEscalaCinza, self.converterPretoBranco]
+                                             self.converterParaEscalaCinza, self.converterParaPretoBranco]
 
         self.listaFiltrosImgPretoBranco = [self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
                                            self.deteccaoDeBordasFiltroBeta, self.deteccaoDeBordasFiltroZeta,
                                            self.transformacaoMorfologica]
 
+    '''Métodos que irão criar as actions dos filtros e transformações'''
+    def criarActionConverterParaEscalaCinza(self):
+        self.converterParaEscalaCinza = self.menuTransformacao.addAction("Converter para Escala de C&inza")
+        self.converterParaEscalaCinza.setShortcut("Ctrl+Shift+I")
+        self.converterParaEscalaCinza.setDisabled(True)
+        self.converterParaEscalaCinza.setCheckable(True)
+        self.converterParaEscalaCinza.setChecked(False)
+        self.converterParaEscalaCinza.triggered.connect(lambda: self.transformarImagem(
+            self.converterParaEscalaCinza, 'ConverterEscalaDeCinza', '.pgm', 'ArgumentoVazio'))
+
+    def criarActionConverterParaPretoBranco(self):
+        self.converterParaPretoBranco = self.menuTransformacao.addAction("Converter Para Pre&to e Branco")
+        self.converterParaPretoBranco.setShortcut("Ctrl+Shift+T")
+        self.converterParaPretoBranco.setDisabled(True)
+        self.converterParaPretoBranco.setCheckable(True)
+        self.converterParaPretoBranco.setChecked(False)
+        self.converterParaPretoBranco.triggered.connect(lambda: self.transformarImagem(
+            self.converterParaPretoBranco, 'Binaria', '.pbm', 'ArgumentoVazio'))
+
     def criarActionCorrecaoGama(self):
-        self.correcaoGama = self.menuTransformacao.addAction("Filtro Correção &Gama")
+        self.correcaoGama = self.menuTransformacao.addAction("Correção &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
         self.correcaoGama.setDisabled(True)
         self.correcaoGama.setCheckable(True)
         self.correcaoGama.setChecked(False)
         self.correcaoGama.triggered.connect(self.janelaValorCorrecaoGama)
+
+    def criarActionDecomposicaoCanaisRGB(self):
+        self.decomposicaoCanaisRGB = self.menuTransformacao.addMenu("Decomposição &Canais RGB")
+        self.decomposicaoCanaisRGB.setDisabled(True)
+
+        # Submenus com os filtros por camada
+        self.decomporCanalR = self.decomposicaoCanaisRGB.addAction("Vermelho")
+        self.decomporCanalR.setShortcut("Ctrl+Alt+R")
+        self.decomporCanalR.setCheckable(True)
+        self.decomporCanalR.setChecked(False)
+        self.decomporCanalR.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalR, 'CamadaR', '.ppm', 'ArgumentoVazio'))
+
+        self.decomporCanalG = self.decomposicaoCanaisRGB.addAction("Verde")
+        self.decomporCanalG.setShortcut("Ctrl+Alt+G")
+        self.decomporCanalG.setCheckable(True)
+        self.decomporCanalG.setChecked(False)
+        self.decomporCanalG.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalG, 'CamadaG', '.ppm', 'ArgumentoVazio'))
+
+        self.decomporCanalB = self.decomposicaoCanaisRGB.addAction("Azul")
+        self.decomporCanalB.setShortcut("Ctrl+Alt+B")
+        self.decomporCanalB.setCheckable(True)
+        self.decomporCanalB.setChecked(False)
+        self.decomporCanalB.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
 
     def criarActionFiltroGaussiano(self):
         self.filtroGaussiano = self.menuTransformacao.addMenu("Filtro Ga&ussiano")
@@ -196,41 +240,6 @@ class MyWindow(QMainWindow):
         self.filtroNegativo.triggered.connect(lambda: self.transformarImagem(
             self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    def criarActionTransformacaoLogaritmica(self):
-        self.transformacaoLogaritmica = self.menuTransformacao.addAction("Transformação &Logarítmica")
-        self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
-        self.transformacaoLogaritmica.setDisabled(True)
-        self.transformacaoLogaritmica.setCheckable(True)
-        self.transformacaoLogaritmica.setChecked(False)
-        self.transformacaoLogaritmica.triggered.connect(lambda: self.transformarImagem(
-            self.transformacaoLogaritmica, 'TransformacaoLogaritmica', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-    def criarActionFiltrosDeteccaoDeBordas(self):
-        self.filtroDeteccaoDeBordas = self.menuTransformacao.addMenu("Filtros &Detecção de Bordas")
-        self.filtroDeteccaoDeBordas.setDisabled(True)
-
-        # Submenus com os filtros
-        self.deteccaoDeBordasFiltroAlfa = self.filtroDeteccaoDeBordas.addAction("Alfa")
-        self.deteccaoDeBordasFiltroAlfa.setShortcut("Ctrl+Alt+A")
-        self.deteccaoDeBordasFiltroAlfa.setCheckable(True)
-        self.deteccaoDeBordasFiltroAlfa.setChecked(False)
-        self.deteccaoDeBordasFiltroAlfa.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroAlfa, 'DeteccaoDeBordasAlfa', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-        self.deteccaoDeBordasFiltroBeta = self.filtroDeteccaoDeBordas.addAction("Beta")
-        self.deteccaoDeBordasFiltroBeta.setShortcut("Ctrl+Alt+B")
-        self.deteccaoDeBordasFiltroBeta.setCheckable(True)
-        self.deteccaoDeBordasFiltroBeta.setChecked(False)
-        self.deteccaoDeBordasFiltroBeta.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroBeta, 'DeteccaoDeBordasBeta', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-        self.deteccaoDeBordasFiltroZeta = self.filtroDeteccaoDeBordas.addAction("Zeta")
-        self.deteccaoDeBordasFiltroZeta.setShortcut("Ctrl+Alt+B")
-        self.deteccaoDeBordasFiltroZeta.setCheckable(True)
-        self.deteccaoDeBordasFiltroZeta.setChecked(False)
-        self.deteccaoDeBordasFiltroZeta.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroZeta, 'DeteccaoDeBordasZeta', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
     def criarActionFiltroSharpen(self):
         self.filtroSharpen = self.menuTransformacao.addAction("Filtro S&harpen")
         self.filtroSharpen.setShortcut("Ctrl+Shift+H")
@@ -249,53 +258,44 @@ class MyWindow(QMainWindow):
         self.filtroSobel.triggered.connect(lambda: self.transformarImagem(
             self.filtroSobel, 'Sobel', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    def criarActionDecomporCanaisRGB(self):
-        self.decomporCanaisRGB = self.menuTransformacao.addMenu("Decompor &Canais RGB")
-        self.decomporCanaisRGB.setDisabled(True)
+    def criarActionFiltrosDeteccaoDeBordas(self):
+        self.filtroDeteccaoDeBordas = self.menuTransformacao.addMenu("Filtros &Detecção de Bordas")
+        self.filtroDeteccaoDeBordas.setDisabled(True)
 
-        # Submenus com os filtros por camada
-        self.decomporCanalR = self.decomporCanaisRGB.addAction("Vermelho")
-        self.decomporCanalR.setShortcut("Ctrl+Alt+R")
-        self.decomporCanalR.setCheckable(True)
-        self.decomporCanalR.setChecked(False)
-        self.decomporCanalR.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCanalR, 'CamadaR', '.ppm', 'ArgumentoVazio'))
+        # Submenus com os filtros
+        self.deteccaoDeBordasFiltroAlfa = self.filtroDeteccaoDeBordas.addAction("Crono")
+        self.deteccaoDeBordasFiltroAlfa.setShortcut("Ctrl+Alt+C")
+        self.deteccaoDeBordasFiltroAlfa.setCheckable(True)
+        self.deteccaoDeBordasFiltroAlfa.setChecked(False)
+        self.deteccaoDeBordasFiltroAlfa.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroAlfa, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-        self.decomporCanalG = self.decomporCanaisRGB.addAction("Verde")
-        self.decomporCanalG.setShortcut("Ctrl+Alt+G")
-        self.decomporCanalG.setCheckable(True)
-        self.decomporCanalG.setChecked(False)
-        self.decomporCanalG.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCanalG, 'CamadaG', '.ppm', 'ArgumentoVazio'))
+        self.deteccaoDeBordasFiltroBeta = self.filtroDeteccaoDeBordas.addAction("Marle")
+        self.deteccaoDeBordasFiltroBeta.setShortcut("Ctrl+Alt+M")
+        self.deteccaoDeBordasFiltroBeta.setCheckable(True)
+        self.deteccaoDeBordasFiltroBeta.setChecked(False)
+        self.deteccaoDeBordasFiltroBeta.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroBeta, 'DeteccaoDeBordasMarle', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-        self.decomporCanalB = self.decomporCanaisRGB.addAction("Azul")
-        self.decomporCanalB.setShortcut("Ctrl+Alt+B")
-        self.decomporCanalB.setCheckable(True)
-        self.decomporCanalB.setChecked(False)
-        self.decomporCanalB.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
+        self.deteccaoDeBordasFiltroZeta = self.filtroDeteccaoDeBordas.addAction("Prometheus")
+        self.deteccaoDeBordasFiltroZeta.setShortcut("Ctrl+Alt+P")
+        self.deteccaoDeBordasFiltroZeta.setCheckable(True)
+        self.deteccaoDeBordasFiltroZeta.setChecked(False)
+        self.deteccaoDeBordasFiltroZeta.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroZeta, 'DeteccaoDeBordasPrometheus', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    def criarActionConverterPretoBranco(self):
-        self.converterPretoBranco = self.menuTransformacao.addAction("Converter Pre&to e Branco")
-        self.converterPretoBranco.setShortcut("Ctrl+Shift+T")
-        self.converterPretoBranco.setDisabled(True)
-        self.converterPretoBranco.setCheckable(True)
-        self.converterPretoBranco.setChecked(False)
-        self.converterPretoBranco.triggered.connect(lambda: self.transformarImagem(
-            self.converterPretoBranco, 'Binaria', '.pbm', 'ArgumentoVazio'))
-
-    def criarActionConverterEscalaCinza(self):
-        self.converterEscalaCinza = self.menuTransformacao.addAction("Converter para Escala de C&inza")
-        self.converterEscalaCinza.setShortcut("Ctrl+Shift+I")
-        self.converterEscalaCinza.setDisabled(True)
-        self.converterEscalaCinza.setCheckable(True)
-        self.converterEscalaCinza.setChecked(False)
-        self.converterEscalaCinza.triggered.connect(lambda: self.transformarImagem(
-            self.converterEscalaCinza, 'ConverterEscalaDeCinza', '.pgm', 'ArgumentoVazio'))
+    def criarActionTransformacaoLogaritmica(self):
+        self.transformacaoLogaritmica = self.menuTransformacao.addAction("Transformação &Logarítmica")
+        self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
+        self.transformacaoLogaritmica.setDisabled(True)
+        self.transformacaoLogaritmica.setCheckable(True)
+        self.transformacaoLogaritmica.setChecked(False)
+        self.transformacaoLogaritmica.triggered.connect(lambda: self.transformarImagem(
+            self.transformacaoLogaritmica, 'TransformacaoLogaritmica', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionTransformacaoMorfologica(self):
 
-        self.transformacaoMorfologica = self.menuTransformacao.addAction("&Morfológicas")
+        self.transformacaoMorfologica = self.menuTransformacao.addAction("Transformações &Morfológicas")
         self.transformacaoMorfologica.setShortcut("Ctrl+Shift+M")
         self.transformacaoMorfologica.setDisabled(True)
         self.transformacaoMorfologica.setCheckable(True)
@@ -520,8 +520,8 @@ class MyWindow(QMainWindow):
         elif self.extensaoImagemOriginal == '.pgm':
             for filtro in self.listaFiltrosImgColoridaCinza:
                 filtro.setDisabled(False)
-            self.decomporCanaisRGB.setDisabled(True)
-            self.converterEscalaCinza.setDisabled(True)
+            self.decomposicaoCanaisRGB.setDisabled(True)
+            self.converterParaEscalaCinza.setDisabled(True)
             self.transformacaoMorfologica.setDisabled(True)
 
 

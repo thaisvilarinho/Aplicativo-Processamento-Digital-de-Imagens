@@ -5,7 +5,7 @@ import numpy as np
 import math
 
 
-def receberArquivos():
+def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
 
     # Fazer o Processamento Digital de Imagens
@@ -61,4 +61,4 @@ def escreverImagemSaida(entrada, dimensoes, imagem, kernel, ks):
 
 
 if __name__ == "__main__":
-    receberArquivos()
+    lerImagemEntrada()
