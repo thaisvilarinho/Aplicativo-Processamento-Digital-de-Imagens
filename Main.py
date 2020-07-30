@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
 from win32api import GetSystemMetrics
 from ValorCorrecaoGama import JanelaValorGama
+from ValorLimiteSobel import JanelaValorLimiteSobel
 
 porcentagemProgresso = 0
 imagemResultado = 'imagensResultado/imagemTransformada'
@@ -44,7 +45,7 @@ class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
         self.setWindowTitle("Processamento Digital de Imagens - IFTM")
-        self.setWindowIcon(QIcon("imagens/icon.jpg"))
+        self.icon = self.setWindowIcon(QIcon("imagens/icon.jpg"))
         self.setGeometry(450, 150, 800, 600)
         self.initUI()
         self.show()
@@ -54,7 +55,6 @@ class MyWindow(QMainWindow):
     def initUI(self):
         self.criarWidgets()
         self.gerarLayouts()
-
     '''Cria os widgets que encorporam o Menu e widgets que executaram ações'''
 
     def criarWidgets(self):
@@ -132,14 +132,14 @@ class MyWindow(QMainWindow):
         self.listaFiltrosImgColoridaCinza = [self.correcaoGama, self.filtroGaussiano, self.kernelGaussiano3x3,
                                              self.kernelGaussiano5x5, self.kernelGaussiano5x5, self.filtroMediana,
                                              self.filtroNegativo, self.transformacaoLogaritmica,
-                                             self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
-                                             self.deteccaoDeBordasFiltroBeta, self.deteccaoDeBordasFiltroZeta,
+                                             self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroCrono,
+                                             self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
                                              self.filtroSharpen, self.filtroSobel, self.decomposicaoCanaisRGB,
                                              self.decomporCanalR, self.decomporCanalG, self.decomporCanalB,
                                              self.converterParaEscalaCinza, self.converterParaPretoBranco]
 
-        self.listaFiltrosImgPretoBranco = [self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
-                                           self.deteccaoDeBordasFiltroBeta, self.deteccaoDeBordasFiltroZeta,
+        self.listaFiltrosImgPretoBranco = [self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroCrono,
+                                           self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
                                            self.transformacaoMorfologica]
 
     '''Métodos que irão criar as actions dos filtros e transformações'''
@@ -255,34 +255,33 @@ class MyWindow(QMainWindow):
         self.filtroSobel.setDisabled(True)
         self.filtroSobel.setCheckable(True)
         self.filtroSobel.setChecked(False)
-        self.filtroSobel.triggered.connect(lambda: self.transformarImagem(
-            self.filtroSobel, 'Sobel', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+        self.filtroSobel.triggered.connect(self.janelaValorLimiteSobel)
 
     def criarActionFiltrosDeteccaoDeBordas(self):
         self.filtroDeteccaoDeBordas = self.menuTransformacao.addMenu("Filtros &Detecção de Bordas")
         self.filtroDeteccaoDeBordas.setDisabled(True)
 
         # Submenus com os filtros
-        self.deteccaoDeBordasFiltroAlfa = self.filtroDeteccaoDeBordas.addAction("Crono")
-        self.deteccaoDeBordasFiltroAlfa.setShortcut("Ctrl+Alt+C")
-        self.deteccaoDeBordasFiltroAlfa.setCheckable(True)
-        self.deteccaoDeBordasFiltroAlfa.setChecked(False)
-        self.deteccaoDeBordasFiltroAlfa.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroAlfa, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+        self.deteccaoDeBordasFiltroCrono = self.filtroDeteccaoDeBordas.addAction("Crono")
+        self.deteccaoDeBordasFiltroCrono.setShortcut("Ctrl+Alt+C")
+        self.deteccaoDeBordasFiltroCrono.setCheckable(True)
+        self.deteccaoDeBordasFiltroCrono.setChecked(False)
+        self.deteccaoDeBordasFiltroCrono.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroCrono, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-        self.deteccaoDeBordasFiltroBeta = self.filtroDeteccaoDeBordas.addAction("Marle")
-        self.deteccaoDeBordasFiltroBeta.setShortcut("Ctrl+Alt+M")
-        self.deteccaoDeBordasFiltroBeta.setCheckable(True)
-        self.deteccaoDeBordasFiltroBeta.setChecked(False)
-        self.deteccaoDeBordasFiltroBeta.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroBeta, 'DeteccaoDeBordasMarle', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+        self.deteccaoDeBordasFiltroMarle = self.filtroDeteccaoDeBordas.addAction("Marle")
+        self.deteccaoDeBordasFiltroMarle.setShortcut("Ctrl+Alt+M")
+        self.deteccaoDeBordasFiltroMarle.setCheckable(True)
+        self.deteccaoDeBordasFiltroMarle.setChecked(False)
+        self.deteccaoDeBordasFiltroMarle.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroMarle, 'DeteccaoDeBordasMarle', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-        self.deteccaoDeBordasFiltroZeta = self.filtroDeteccaoDeBordas.addAction("Prometheus")
-        self.deteccaoDeBordasFiltroZeta.setShortcut("Ctrl+Alt+P")
-        self.deteccaoDeBordasFiltroZeta.setCheckable(True)
-        self.deteccaoDeBordasFiltroZeta.setChecked(False)
-        self.deteccaoDeBordasFiltroZeta.triggered.connect(lambda: self.transformarImagem(
-            self.deteccaoDeBordasFiltroZeta, 'DeteccaoDeBordasPrometheus', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+        self.deteccaoDeBordasFiltroPrometheus = self.filtroDeteccaoDeBordas.addAction("Prometheus")
+        self.deteccaoDeBordasFiltroPrometheus.setShortcut("Ctrl+Alt+P")
+        self.deteccaoDeBordasFiltroPrometheus.setCheckable(True)
+        self.deteccaoDeBordasFiltroPrometheus.setChecked(False)
+        self.deteccaoDeBordasFiltroPrometheus.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasFiltroPrometheus, 'DeteccaoDeBordasPrometheus', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionTransformacaoLogaritmica(self):
         self.transformacaoLogaritmica = self.menuTransformacao.addAction("Transformação &Logarítmica")
@@ -327,12 +326,24 @@ class MyWindow(QMainWindow):
     ''' Instancia classe para definir valor fator gama do filtro correção gama'''
     def janelaValorCorrecaoGama(self):
         self.janelaGama = JanelaValorGama()
-        self.janelaGama.botaoOk.clicked.connect(self.selecionarValorSliderGama)
+        self.janelaGama.enviarValor.clicked.connect(self.pegarValorSliderGama)
 
-    def selecionarValorSliderGama(self):
+    ''' Pegar valor Gama definido na classe ValorCorrecaoGama para repassar como linha de argumento para
+    script externo executar aplicação da correção gama na imagem'''
+
+    def pegarValorSliderGama(self):
         valorFatorGama = str(self.janelaGama.valorSlider)
         self.janelaGama.close()
         self.transformarImagem(self.correcaoGama, 'CorrecaoGama', self.extensaoImagemOriginal, valorFatorGama)
+
+    def janelaValorLimiteSobel(self):
+        self.janelaSobel = JanelaValorLimiteSobel()
+        self.janelaSobel.enviarValor.clicked.connect(self.pegarValorLimiteSobel)
+
+    def pegarValorLimiteSobel(self):
+        valorLimiteSobel = str(self.janelaSobel.valorSlider)
+        self.janelaSobel.close()
+        self.transformarImagem(self.filtroSobel, 'Sobel', self.extensaoImagemOriginal, valorLimiteSobel)
 
     '''Exibe informações sobre aplicativo e imagem quando selecionado menu Sobre'''
     def mostrarInformacoesSobre(self):

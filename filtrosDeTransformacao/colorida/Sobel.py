@@ -4,6 +4,11 @@ import sys
 import numpy as np
 import math
 
+'''
+O filtro Sobel detecta bordas horizontais e verticais separadamente em uma imagem em escalas-de-cinza. 
+As cores da imagem são transformadas de RGB para escalas-de-cinza. 
+O resultado é uma imagem transparente com linhas pretas e alguns restos de cores.'''
+
 
 def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
@@ -26,7 +31,7 @@ def lerImagemEntrada():
     kernely = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
     kernely = np.asarray(kernely)
     ks = int((len(kernelx) - 1) / 2)
-    threshold = 200
+    threshold = int(sys.argv[3])
 
     escreverImagemSaida(entrada, dimensoes, imagem, kernelx, kernely, ks, threshold)
 
@@ -57,6 +62,7 @@ def escreverImagemSaida(entrada, dimensoes, imagem, kernelx, kernely, ks, thresh
                 # aplicando valor Threshold escolhido pelo usuário
                 sum = max(sumxy, threshold)
                 sum = int(sum) if sum != threshold else 0
+                print(sum)
                 sum = str(sum)
                 saida.write(sum)
                 saida.write("\n")

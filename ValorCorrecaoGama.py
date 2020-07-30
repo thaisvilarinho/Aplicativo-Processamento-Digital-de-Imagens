@@ -41,10 +41,10 @@ class JanelaValorGama(QWidget):
         self.slider.setMaximum(20)
         self.slider.setTickPosition(QSlider.TicksAbove)
         self.slider.setTickInterval(1)
-        self.slider.valueChanged.connect(self.exibirValorGama)
+        self.slider.valueChanged.connect(self.exibirValor)
 
-        self.botaoOk = QPushButton('Ok')
-        self.botaoOk.setToolTip("Enviar valor escolhido")
+        self.enviarValor = QPushButton('Enviar Valor')
+        self.enviarValor.setToolTip("Enviar valor escolhido")
 
     def gerarLayouts(self):
         vbox = QVBoxLayout()
@@ -54,10 +54,10 @@ class JanelaValorGama(QWidget):
         vbox.addWidget(self.textoValor)
         vbox.addStretch()
         vbox.addWidget(self.slider)
-        vbox.addWidget(self.botaoOk)
+        vbox.addWidget(self.enviarValor)
         self.setLayout(vbox)
 
-    def exibirValorGama(self):
+    def exibirValor(self):
         self.valorSlider = (float(self.slider.value() / 10))
         self.textoValor.setText(str(self.valorSlider))
 
