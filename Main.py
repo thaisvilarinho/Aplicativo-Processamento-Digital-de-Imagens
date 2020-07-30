@@ -125,7 +125,7 @@ class MyWindow(QMainWindow):
         self.criarActionFiltrosDeteccaoDeBordas()
         self.criarActionFiltroSharpen()
         self.criarActionFiltroSobel()
-        self.criarActionDecomporCamadasRGB()
+        self.criarActionDecomporCanaisRGB()
         self.criarActionConverterPretoBranco()
         self.criarActionConverterEscalaCinza()
         self.criarActionTransformacaoMorfologica()
@@ -135,8 +135,8 @@ class MyWindow(QMainWindow):
                                              self.filtroNegativo, self.transformacaoLogaritmica,
                                              self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
                                              self.deteccaoDeBordasFiltroBeta, self.deteccaoDeBordasFiltroZeta,
-                                             self.filtroSharpen, self.filtroSobel, self.decomporCamadasRGB,
-                                             self.decomporCamadaR, self.decomporCamadaG, self.decomporCamadaB,
+                                             self.filtroSharpen, self.filtroSobel, self.decomporCanaisRGB,
+                                             self.decomporCanalR, self.decomporCanalG, self.decomporCanalB,
                                              self.converterEscalaCinza, self.converterPretoBranco]
 
         self.listaFiltrosImgPretoBranco = [self.filtroDeteccaoDeBordas, self.deteccaoDeBordasFiltroAlfa,
@@ -249,31 +249,31 @@ class MyWindow(QMainWindow):
         self.filtroSobel.triggered.connect(lambda: self.transformarImagem(
             self.filtroSobel, 'Sobel', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    def criarActionDecomporCamadasRGB(self):
-        self.decomporCamadasRGB = self.menuTransformacao.addMenu("Decompor &Camadas RGB")
-        self.decomporCamadasRGB.setDisabled(True)
+    def criarActionDecomporCanaisRGB(self):
+        self.decomporCanaisRGB = self.menuTransformacao.addMenu("Decompor &Canais RGB")
+        self.decomporCanaisRGB.setDisabled(True)
 
         # Submenus com os filtros por camada
-        self.decomporCamadaR = self.decomporCamadasRGB.addAction("Camada R")
-        self.decomporCamadaR.setShortcut("Ctrl+Alt+R")
-        self.decomporCamadaR.setCheckable(True)
-        self.decomporCamadaR.setChecked(False)
-        self.decomporCamadaR.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCamadaR, 'CamadaR', '.ppm', 'ArgumentoVazio'))
+        self.decomporCanalR = self.decomporCanaisRGB.addAction("Vermelho")
+        self.decomporCanalR.setShortcut("Ctrl+Alt+R")
+        self.decomporCanalR.setCheckable(True)
+        self.decomporCanalR.setChecked(False)
+        self.decomporCanalR.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalR, 'CamadaR', '.ppm', 'ArgumentoVazio'))
 
-        self.decomporCamadaG = self.decomporCamadasRGB.addAction("Camada G")
-        self.decomporCamadaG.setShortcut("Ctrl+Alt+G")
-        self.decomporCamadaG.setCheckable(True)
-        self.decomporCamadaG.setChecked(False)
-        self.decomporCamadaG.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCamadaG, 'CamadaG', '.ppm', 'ArgumentoVazio'))
+        self.decomporCanalG = self.decomporCanaisRGB.addAction("Verde")
+        self.decomporCanalG.setShortcut("Ctrl+Alt+G")
+        self.decomporCanalG.setCheckable(True)
+        self.decomporCanalG.setChecked(False)
+        self.decomporCanalG.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalG, 'CamadaG', '.ppm', 'ArgumentoVazio'))
 
-        self.decomporCamadaB = self.decomporCamadasRGB.addAction("Camada B")
-        self.decomporCamadaB.setShortcut("Ctrl+Alt+B")
-        self.decomporCamadaB.setCheckable(True)
-        self.decomporCamadaB.setChecked(False)
-        self.decomporCamadaB.triggered.connect(lambda: self.transformarImagem(
-            self.decomporCamadaB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
+        self.decomporCanalB = self.decomporCanaisRGB.addAction("Azul")
+        self.decomporCanalB.setShortcut("Ctrl+Alt+B")
+        self.decomporCanalB.setCheckable(True)
+        self.decomporCanalB.setChecked(False)
+        self.decomporCanalB.triggered.connect(lambda: self.transformarImagem(
+            self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
 
     def criarActionConverterPretoBranco(self):
         self.converterPretoBranco = self.menuTransformacao.addAction("Converter Pre&to e Branco")
@@ -520,7 +520,7 @@ class MyWindow(QMainWindow):
         elif self.extensaoImagemOriginal == '.pgm':
             for filtro in self.listaFiltrosImgColoridaCinza:
                 filtro.setDisabled(False)
-            self.decomporCamadasRGB.setDisabled(True)
+            self.decomporCanaisRGB.setDisabled(True)
             self.converterEscalaCinza.setDisabled(True)
             self.transformacaoMorfologica.setDisabled(True)
 
