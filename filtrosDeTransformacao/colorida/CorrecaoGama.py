@@ -3,6 +3,11 @@
 import sys
 import numpy as np
 
+# Checando os argumentos de linha de comando
+if __name__ == "__main__":
+    print(f'Quantos argumentos: {len(sys.argv)}')
+    for i, arg in enumerate(sys.argv):
+        print(f'Argument:{i}: {arg}')
 
 def receberArquivos():
     # Abrir os arquivos de entrada e de saída
@@ -37,7 +42,7 @@ def gerarImagemTransformada(entrada, saida, dimensoes, imagem):
     saida.write("\n")
     saida.write("255\n")
     # fator gamma
-    gamma = 1.8
+    gamma = float(sys.argv[3])
 
     # calcular a correção gama sobre a imagem
     for i in range(len(imagem)):
