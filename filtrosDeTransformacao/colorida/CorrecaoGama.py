@@ -3,6 +3,10 @@
 import sys
 import numpy as np
 
+'''Gama ou correção de gama é uma operação não-linear que é usada para codificar e decodificar luminância ou valores 
+de cores em imagem. Ela é usada em muitos tipos de sistemas de imagem para endireitar uma resposta curva de 
+sinal-para-luz ou deintensidade-para-sinal. O Gama é usado como um expoente (potência) na equação de correção'''
+
 
 def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
