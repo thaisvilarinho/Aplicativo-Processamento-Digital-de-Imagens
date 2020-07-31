@@ -13,15 +13,16 @@ def lerImagemEntrada():
     dimensoes = linha.split()
     largura = int(dimensoes[0])
     altura = int(dimensoes[1])
-    linha = entrada.readline() #Valor fixo
+    linha = entrada.readline()  # Valor fixo
     linha = entrada.readlines()
 
     imagem = np.asarray(linha, dtype=int)
     imagem = np.reshape(imagem, (altura, largura))
 
-    # Matriz Filtro Gaussiano 3x3
-    kernel = [[1, 2, 1], [2, 4, 2], [1, 2, 1]]
-    kernel = np.asarray(kernel) / 16
+    # Matriz Filtro Gaussiano 7x7
+    kernel = [[0, 0, 1, 2, 1, 0, 0], [0, 3, 13, 22, 13, 3, 0], [1, 13, 59, 97, 59, 13, 1], [2, 22, 97, 159, 97, 22, 2],
+              [1, 13, 59, 97, 59, 13, 1], [0, 3, 13, 22, 13, 3, 0], [0, 0, 1, 2, 1, 0, 0]]
+    kernel = np.asarray(kernel) / 1003
 
     ks = int((len(kernel) - 1) / 2)
 
@@ -32,15 +33,15 @@ def escreverImagemSaida(entrada, largura, altura, imagem, kernel, ks):
     saida = open(sys.argv[2], "w+")
     saida.write("P2\n")
     saida.write("#Criado por Thais\n")
-    saida.write(str(largura-(ks*2)))
+    saida.write(str(largura - (ks * 2)))
     saida.write(" ")
-    saida.write(str(altura-(ks*2)))
+    saida.write(str(altura - (ks * 2)))
     saida.write("\n")
     saida.write("255\n")
 
     # aplicar filtro gaussiano na imagem
-    for i in range(ks, len(imagem)-ks):
-        for j in range(ks, len(imagem[1])-ks):
+    for i in range(ks, len(imagem) - ks):
+        for j in range(ks, len(imagem[1]) - ks):
             sum = 0
             for ki in range(len(kernel)):
                 for kj in range(len(kernel[1])):
@@ -53,6 +54,7 @@ def escreverImagemSaida(entrada, largura, altura, imagem, kernel, ks):
     # fechar os arquivos
     entrada.close()
     saida.close()
+
 
 if __name__ == "__main__":
     lerImagemEntrada()

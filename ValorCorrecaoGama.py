@@ -12,7 +12,7 @@ class JanelaValorGama(QWidget):
     def __init__(self):
         super(JanelaValorGama, self).__init__()
         self.setWindowTitle("Correção Gama")
-        self.setWindowIcon(QIcon("imagens/icon.jpg"))
+        self.setWindowIcon(QIcon("icones/icon.jpg"))
         self.setGeometry(700, 350, 250, 150)
         self.setFixedSize(250, 150)
         self.setWindowModality(Qt.ApplicationModal)
@@ -29,7 +29,7 @@ class JanelaValorGama(QWidget):
     '''Cria os widgets que encorporam o Menu e widgets que executaram ações'''
 
     def criarWidgets(self):
-        self.legenda = QLabel("Defina um Valor para Correção Gama")
+        self.legenda = QLabel("Defina um valor para Correção Gama")
         self.legenda.setAlignment(Qt.AlignCenter)
         self.legenda.setFont(fonteLegenda)
         self.textoValor = QLabel("0")

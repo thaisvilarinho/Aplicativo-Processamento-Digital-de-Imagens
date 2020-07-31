@@ -48,9 +48,9 @@ def escreverImagemSaida(entrada, largura, altura, imagem):
     saida.write(" ")
     saida.write(str(altura))
     saida.write("\n")
-    limite = 192
+    limite = int(sys.argv[3])
 
-    #fazer a cópia para imagem binária
+    # fazer a cópia para imagem binária
     for i in range(len(imagem)):
         for j in range(len(imagem[1])):
             if imagem[i][j] > limite:

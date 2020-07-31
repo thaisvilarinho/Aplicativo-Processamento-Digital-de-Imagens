@@ -12,7 +12,7 @@ class JanelaValorLimiteSobel(QWidget):
     def __init__(self):
         super(JanelaValorLimiteSobel, self).__init__()
         self.setWindowTitle("Limite Sobel")
-        self.setWindowIcon(QIcon("imagens/icon.jpg"))
+        self.setWindowIcon(QIcon("icones/icon.jpg"))
         self.setGeometry(700, 350, 250, 150)
         self.setFixedSize(250, 150)
         self.setWindowModality(Qt.ApplicationModal)

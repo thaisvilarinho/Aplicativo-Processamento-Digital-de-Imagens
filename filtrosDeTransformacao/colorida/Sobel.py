@@ -1,13 +1,13 @@
 # *-* coding: utf:8 -*-
 
+'''
+O filtro Sobel detecta bordas horizontais e verticais separadamente em uma imagem em escalas-de-cinza.
+As cores da imagem são transformadas de RGB para escalas-de-cinza.
+O resultado é uma imagem transparente com linhas pretas e alguns restos de cores.'''
+
 import sys
 import numpy as np
 import math
-
-'''
-O filtro Sobel detecta bordas horizontais e verticais separadamente em uma imagem em escalas-de-cinza. 
-As cores da imagem são transformadas de RGB para escalas-de-cinza. 
-O resultado é uma imagem transparente com linhas pretas e alguns restos de cores.'''
 
 
 def lerImagemEntrada():

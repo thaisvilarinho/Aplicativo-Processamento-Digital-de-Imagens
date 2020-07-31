@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
 from win32api import GetSystemMetrics
 from ValorCorrecaoGama import JanelaValorGama
+from ValorLimitePretoBranco import JanelaValorLimitePretoBranco
 from ValorLimiteSobel import JanelaValorLimiteSobel
 
 porcentagemProgresso = 0
@@ -115,8 +116,8 @@ class MyWindow(QMainWindow):
 
     def criarSubmenus(self):
 
-        self.criarSubmenuAjusteNitidez()
-        self.criarSubmenuAjusteLuminancia()
+        self.criarSubmenuAjustarNitidez()
+        self.criarSubmenuAjustarLuminancia()
         self.criarSubmenuConversao()
         self.criarSubmenuDecomporCanaisRGB()
         self.criarSubmenuDesfocar()
@@ -129,18 +130,18 @@ class MyWindow(QMainWindow):
 
     '''Criar Submenus'''
 
-    def criarSubmenuAjusteNitidez(self):
+    def criarSubmenuAjustarNitidez(self):
         # Submenu
-        self.submenuAjusteNitidez = self.menuTransformacao.addMenu("Ajuste Nitide&z")
-        self.submenuAjusteNitidez.setDisabled(True)
+        self.submenuAjustarNitidez = self.menuTransformacao.addMenu("Ajustar Nitide&z")
+        self.submenuAjustarNitidez.setDisabled(True)
 
         # Actions do submenu
         self.criarActionFiltroSharpen()
 
-    def criarSubmenuAjusteLuminancia(self):
+    def criarSubmenuAjustarLuminancia(self):
         # Submenu
-        self.submenuAjusteLuminancia = self.menuTransformacao.addMenu("A&juste Luminância")
-        self.submenuAjusteLuminancia.setDisabled(True)
+        self.submenuAjustarLuminancia = self.menuTransformacao.addMenu("A&justar Luminância")
+        self.submenuAjustarLuminancia.setDisabled(True)
 
         # Actions do submenu
         self.criarActionCorrecaoGama()
@@ -166,7 +167,7 @@ class MyWindow(QMainWindow):
 
     def criarSubmenuDesfocar(self):
         # Submenu
-        self.submenuFiltrosDesfocar = self.menuTransformacao.addMenu("Filtros de Des&focar")
+        self.submenuFiltrosDesfocar = self.menuTransformacao.addMenu("Des&focar")
         self.submenuFiltrosDesfocar.setDisabled(True)
 
         # Actions do submenu
@@ -211,11 +212,10 @@ class MyWindow(QMainWindow):
         self.converterParaPretoBranco.setDisabled(True)
         self.converterParaPretoBranco.setCheckable(True)
         self.converterParaPretoBranco.setChecked(False)
-        self.converterParaPretoBranco.triggered.connect(lambda: self.transformarImagem(
-            self.converterParaPretoBranco, 'ConverterImagemBinaria', '.pbm', 'ArgumentoVazio'))
+        self.converterParaPretoBranco.triggered.connect(self.janelaValorLimitePretoBranco)
 
     def criarActionCorrecaoGama(self):
-        self.correcaoGama = self.submenuAjusteLuminancia.addAction("Correção &Gama")
+        self.correcaoGama = self.submenuAjustarLuminancia.addAction("Correção &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
         self.correcaoGama.setDisabled(True)
         self.correcaoGama.setCheckable(True)
@@ -314,7 +314,7 @@ class MyWindow(QMainWindow):
             self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionFiltroSharpen(self):
-        self.filtroSharpen = self.submenuAjusteNitidez.addAction("Filtro S&harpen")
+        self.filtroSharpen = self.submenuAjustarNitidez.addAction("Filtro S&harpen")
         self.filtroSharpen.setShortcut("Ctrl+Shift+H")
         self.filtroSharpen.setDisabled(True)
         self.filtroSharpen.setCheckable(True)
@@ -349,8 +349,8 @@ class MyWindow(QMainWindow):
             self.transformacaoMorfologica, 'BordasDilatacao', '.pbm', 'ArgumentoVazio'))
 
     def criarListasChecagemFiltros(self):
-        self.listaFiltrosImgColoridaCinza = [self.submenuAjusteNitidez, self.filtroSharpen,
-                                             self.submenuAjusteLuminancia, self.correcaoGama,
+        self.listaFiltrosImgColoridaCinza = [self.submenuAjustarNitidez, self.filtroSharpen,
+                                             self.submenuAjustarLuminancia, self.correcaoGama,
                                              self.submenuConversao, self.converterParaEscalaCinza,
                                              self.converterParaPretoBranco, self.submenuFiltrosDesfocar,
                                              self.submenuFiltroGaussiano, self.kernelGaussiano3x3,
@@ -366,7 +366,6 @@ class MyWindow(QMainWindow):
                                            self.transformacaoMorfologica]
 
     '''Gerar Layouts'''
-
     def gerarLayouts(self):
         # Criando janela
         self.janelaAreaVisualizacao = QWidget(self)
@@ -391,7 +390,6 @@ class MyWindow(QMainWindow):
     '''Abre imagem selecionada pelo usuário e mantêm oculta diretório que mantem cópias de imagens anteriores que foram 
     transformadas, também solicita habilitar visibilidade dos menus e ações, remoção de cópias de imagens anteriores 
     transformadas, zera porcentagem da barra de progresso, defini pixmap da Imagem a ser exibida'''
-
     def abrirImagem(self):
         global imagemResultado
 
@@ -454,27 +452,36 @@ class MyWindow(QMainWindow):
     '''Instancia classe ValorCorrecaoGama e pega valor fator gama 
     escolhido pelo usuário ao apertar botão enviar valor'''
     def janelaValorCorrecaoGama(self):
-        self.janelaGama = JanelaValorGama()
-        self.janelaGama.enviarValor.clicked.connect(self.pegarValorSliderGama)
+        self.janelaValorFatorGama = JanelaValorGama()
+        self.janelaValorFatorGama.enviarValor.clicked.connect(self.pegarValorSliderGama)
 
     '''Pegar valor fator Gama escolhido pelo usuário e repassa-lo como linha de argumento para script 
     externo executar aplicação da correção gama na imagem'''
     def pegarValorSliderGama(self):
-        valorFatorGama = str(self.janelaGama.valorSlider)
-        self.janelaGama.close()
+        valorFatorGama = str(self.janelaValorFatorGama.valorSlider)
+        self.janelaValorFatorGama.close()
         self.transformarImagem(self.correcaoGama, 'CorrecaoGama', self.extensaoImagemOriginal, valorFatorGama)
 
     '''Instancia classe ValorCorrecaoGama e pega valor fator gama 
     escolhido pelo usuário ao apertar botão enviar valor'''
     def janelaValorLimiteSobel(self):
-        self.janelaSobel = JanelaValorLimiteSobel()
-        self.janelaSobel.enviarValor.clicked.connect(self.pegarValorLimiteSobel)
+        self.janelaValorLimiteSobel = JanelaValorLimiteSobel()
+        self.janelaValorLimiteSobel.enviarValor.clicked.connect(self.pegarValorLimiteSobel)
 
     '''Pegar valor fator Gama definido na classe ValorLimiteSobel'''
     def pegarValorLimiteSobel(self):
-        valorLimiteSobel = str(self.janelaSobel.valorSlider)
-        self.janelaSobel.close()
+        valorLimiteSobel = str(self.janelaValorLimiteSobel.valorSlider)
+        self.janelaValorLimiteSobel.close()
         self.transformarImagem(self.filtroSobel, 'Sobel', self.extensaoImagemOriginal, valorLimiteSobel)
+
+    def janelaValorLimitePretoBranco(self):
+        self.janelaValorLimitePretoBranco = JanelaValorLimitePretoBranco()
+        self.janelaValorLimitePretoBranco.enviarValor.clicked.connect(self.pegarValorLimitePretoBranco)
+
+    def pegarValorLimitePretoBranco(self):
+        valorLimitePretoBranco = str(self.janelaValorLimitePretoBranco.valorSlider)
+        self.janelaValorLimitePretoBranco.close()
+        self.transformarImagem(self.converterParaPretoBranco, 'ConverterImagemBinaria', '.pbm', valorLimitePretoBranco)
 
     '''Exibe informações sobre aplicativo e imagem quando selecionado menu Sobre'''
     def mostrarInformacoesSobre(self):
@@ -507,7 +514,7 @@ class MyWindow(QMainWindow):
 
                 self.caixaMensagem.exec_()
 
-        '''Salva Cópia de Imagem com nome de arquivo e diretório escolhidos pelo usuário'''
+    '''Salva Cópia de Imagem com nome de arquivo e diretório escolhidos pelo usuário'''
     def salvarImagemComo(self):
         global extensaoImagemResultado
         try:

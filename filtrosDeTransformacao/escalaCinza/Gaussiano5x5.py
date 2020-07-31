@@ -19,9 +19,9 @@ def lerImagemEntrada():
     imagem = np.asarray(linha, dtype=int)
     imagem = np.reshape(imagem, (altura, largura))
 
-    # Matriz Filtro Gaussiano 3x3
-    kernel = [[1, 2, 1], [2, 4, 2], [1, 2, 1]]
-    kernel = np.asarray(kernel) / 16
+    # Matriz Filtro Gaussiano 5x5
+    kernel = [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]]
+    kernel = np.asarray(kernel)/273
 
     ks = int((len(kernel) - 1) / 2)
 
