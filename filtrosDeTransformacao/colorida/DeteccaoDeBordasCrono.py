@@ -39,7 +39,7 @@ def escreverImagemSaida(entrada, dimensoes, imagem, kernel, ks):
     saida.write('\n')
     saida.write('255\n')
 
-    # aplicar deteccao de bordas
+    # aplicar detecção de bordas
     for i in range(ks, len(imagem)-ks):
         for j in range(ks, len(imagem[1])-ks):
             for k in range(3):

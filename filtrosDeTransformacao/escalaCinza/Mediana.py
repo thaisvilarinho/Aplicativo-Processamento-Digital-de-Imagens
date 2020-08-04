@@ -1,5 +1,8 @@
 # *-* coding: utf:8 -*-
 
+'''Este filtro é usado para remover pequenos defeitos devido à poeira ou arranhões em uma imagem digitalizada
+O filtro substitui cada pixel com o valor da mediana dos pixels dentro do raio específico.'''
+
 import sys
 import numpy as np
 

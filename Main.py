@@ -19,17 +19,14 @@ extensaoImagemResultado = '.ppm'
 def excluirCopiaImgTransformada():
     global imagemResultado
     try:
-        if os.path.exists(imagemResultado + "Copia" + '.ppm') or os.path.exists(imagemResultado + '.ppm'):
+        if os.path.exists(imagemResultado + "Copia" + '.ppm'):
             os.remove(imagemResultado + "Copia" + '.ppm')
-            os.remove(imagemResultado + '.ppm')
 
-        if os.path.exists(imagemResultado + "Copia" + '.pgm') or os.path.exists(imagemResultado + '.pgm'):
+        if os.path.exists(imagemResultado + "Copia" + '.pgm'):
             os.remove(imagemResultado + "Copia" + '.pgm')
-            os.remove(imagemResultado + '.pgm')
 
-        if os.path.exists(imagemResultado + "Copia" + '.pbm') or os.path.exists(imagemResultado + '.pbm'):
+        if os.path.exists(imagemResultado + "Copia" + '.pbm'):
             os.remove(imagemResultado + "Copia" + '.pbm')
-            os.remove(imagemResultado + '.pbm')
     except:
         pass
 
@@ -117,14 +114,13 @@ class MyWindow(QMainWindow):
     def criarSubmenus(self):
 
         self.criarSubmenuAjustarNitidez()
-        self.criarSubmenuAjustarLuminancia()
         self.criarSubmenuConversao()
         self.criarSubmenuDecomporCanaisRGB()
         self.criarSubmenuDesfocar()
         self.criarSubmenuDeteccaoDeBordas()
-        self.criarActionFiltroNegativo()
-        self.criarActionTransformacaoLogaritmica()
-        self.criarActionTransformacaoMorfologica()
+        self.criarSubmenuInverterCores()
+        self.criarSubmenuRealcarIntensidade()
+        self.criarSubmenuMorfologicas()
 
         self.criarListasChecagemFiltros()
 
@@ -138,13 +134,14 @@ class MyWindow(QMainWindow):
         # Actions do submenu
         self.criarActionFiltroSharpen()
 
-    def criarSubmenuAjustarLuminancia(self):
+    def criarSubmenuRealcarIntensidade(self):
         # Submenu
-        self.submenuAjustarLuminancia = self.menuTransformacao.addMenu("A&justar Luminância")
-        self.submenuAjustarLuminancia.setDisabled(True)
+        self.submenuRealcarIntensidade = self.menuTransformacao.addMenu("Real&çar Intensidade")
+        self.submenuRealcarIntensidade.setDisabled(True)
 
         # Actions do submenu
         self.criarActionCorrecaoGama()
+        self.criarActionTransformacaoLogaritmica()
 
     def criarSubmenuConversao(self):
         # Submenu
@@ -170,13 +167,14 @@ class MyWindow(QMainWindow):
         self.submenuFiltrosDesfocar = self.menuTransformacao.addMenu("Des&focar")
         self.submenuFiltrosDesfocar.setDisabled(True)
 
-        # Actions do submenu
+        # Criar novo submenu
         self.criarSubmenuFiltroGaussiano()
+        # Actions do submenu
         self.criarActionFiltroMediana()
 
     def criarSubmenuDeteccaoDeBordas(self):
         # Submenu
-        self.submenuFiltrosDeteccaoBordas = self.menuTransformacao.addMenu("Filtros &Detecção de Bordas")
+        self.submenuFiltrosDeteccaoBordas = self.menuTransformacao.addMenu("&Detectar Bordas")
         self.submenuFiltrosDeteccaoBordas.setDisabled(True)
 
         # Actions do submenu
@@ -195,11 +193,38 @@ class MyWindow(QMainWindow):
         self.criarActionKernelGaussiano5x5()
         self.criarActionKernelGaussiano7x7()
 
+    def criarSubmenuInverterCores(self):
+        # Submenu
+        self.submenuInverterCores = self.menuTransformacao.addMenu("Inverter Cores")
+        self.submenuInverterCores.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionInverterNegativo()
+
+    def criarSubmenuMorfologicas(self):
+        # Submenu
+        self.submenuMorfologicas = self.menuTransformacao.addMenu("&Morfológicas")
+        self.submenuMorfologicas.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionFiltroAbertura()
+        self.criarActionFiltroDilatacao()
+        self.criarActionFiltroErosao()
+
     '''Criar Actions'''
 
+    def criarActionFiltroAbertura(self):
+        self.filtroAbertura = self.submenuMorfologicas.addAction("&Abertura")
+        self.filtroAbertura.setShortcut("Ctrl+Alt+A")
+        self.filtroAbertura.setDisabled(True)
+        self.filtroAbertura.setCheckable(True)
+        self.filtroAbertura.setChecked(False)
+        self.filtroAbertura.triggered.connect(lambda: self.transformarImagem(
+            self.filtroAbertura, 'Abertura', '.pbm', 'ArgumentoVazio'))
+
     def criarActionConverterParaEscalaCinza(self):
-        self.converterParaEscalaCinza = self.submenuConversao.addAction("Converter para Escala de C&inza")
-        self.converterParaEscalaCinza.setShortcut("Ctrl+Shift+I")
+        self.converterParaEscalaCinza = self.submenuConversao.addAction("&Tons de Cinza")
+        self.converterParaEscalaCinza.setShortcut("Ctrl+Alt+Z")
         self.converterParaEscalaCinza.setDisabled(True)
         self.converterParaEscalaCinza.setCheckable(True)
         self.converterParaEscalaCinza.setChecked(False)
@@ -207,7 +232,7 @@ class MyWindow(QMainWindow):
             self.converterParaEscalaCinza, 'ConverterEscalaDeCinza', '.pgm', 'ArgumentoVazio'))
 
     def criarActionConverterParaPretoBranco(self):
-        self.converterParaPretoBranco = self.submenuConversao.addAction("Converter Para Pre&to e Branco")
+        self.converterParaPretoBranco = self.submenuConversao.addAction("Tons Pre&to e Branco")
         self.converterParaPretoBranco.setShortcut("Ctrl+Shift+T")
         self.converterParaPretoBranco.setDisabled(True)
         self.converterParaPretoBranco.setCheckable(True)
@@ -215,7 +240,7 @@ class MyWindow(QMainWindow):
         self.converterParaPretoBranco.triggered.connect(self.janelaValorLimitePretoBranco)
 
     def criarActionCorrecaoGama(self):
-        self.correcaoGama = self.submenuAjustarLuminancia.addAction("Correção &Gama")
+        self.correcaoGama = self.submenuRealcarIntensidade.addAction("Correção &Gama")
         self.correcaoGama.setShortcut("Ctrl+Shift+G")
         self.correcaoGama.setDisabled(True)
         self.correcaoGama.setCheckable(True)
@@ -247,7 +272,7 @@ class MyWindow(QMainWindow):
             self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
 
     def criarActionDeteccaoDeBordasCrono(self):
-        self.deteccaoDeBordasFiltroCrono = self.submenuFiltrosDeteccaoBordas.addAction("Crono")
+        self.deteccaoDeBordasFiltroCrono = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Crono")
         self.deteccaoDeBordasFiltroCrono.setShortcut("Ctrl+Alt+C")
         self.deteccaoDeBordasFiltroCrono.setCheckable(True)
         self.deteccaoDeBordasFiltroCrono.setChecked(False)
@@ -255,7 +280,7 @@ class MyWindow(QMainWindow):
             self.deteccaoDeBordasFiltroCrono, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionDeteccaoDeBordasMarle(self):
-        self.deteccaoDeBordasFiltroMarle = self.submenuFiltrosDeteccaoBordas.addAction("Marle")
+        self.deteccaoDeBordasFiltroMarle = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Marle")
         self.deteccaoDeBordasFiltroMarle.setShortcut("Ctrl+Alt+M")
         self.deteccaoDeBordasFiltroMarle.setCheckable(True)
         self.deteccaoDeBordasFiltroMarle.setChecked(False)
@@ -263,7 +288,7 @@ class MyWindow(QMainWindow):
             self.deteccaoDeBordasFiltroMarle, 'DeteccaoDeBordasMarle', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionDeteccaoDeBordasPrometheus(self):
-        self.deteccaoDeBordasFiltroPrometheus = self.submenuFiltrosDeteccaoBordas.addAction("Prometheus")
+        self.deteccaoDeBordasFiltroPrometheus = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Prometheus")
         self.deteccaoDeBordasFiltroPrometheus.setShortcut("Ctrl+Alt+P")
         self.deteccaoDeBordasFiltroPrometheus.setCheckable(True)
         self.deteccaoDeBordasFiltroPrometheus.setChecked(False)
@@ -295,6 +320,24 @@ class MyWindow(QMainWindow):
         self.kernelGaussiano7x7.triggered.connect(lambda: self.transformarImagem(
             self.kernelGaussiano7x7, 'Gaussiano7x7', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+    def criarActionFiltroDilatacao(self):
+        self.filtroDilatacao = self.submenuMorfologicas.addAction("&Dilatação")
+        self.filtroDilatacao.setShortcut("Ctrl+Alt+D")
+        self.filtroDilatacao.setDisabled(True)
+        self.filtroDilatacao.setCheckable(True)
+        self.filtroDilatacao.setChecked(False)
+        self.filtroDilatacao.triggered.connect(lambda: self.transformarImagem(
+            self.filtroDilatacao, 'Dilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+    def criarActionFiltroErosao(self):
+        self.filtroErosao = self.submenuMorfologicas.addAction("&Erosão")
+        self.filtroErosao.setShortcut("Ctrl+Alt+E")
+        self.filtroErosao.setDisabled(True)
+        self.filtroErosao.setCheckable(True)
+        self.filtroErosao.setChecked(False)
+        self.filtroErosao.triggered.connect(lambda: self.transformarImagem(
+            self.filtroErosao, 'Dilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
     def criarActionFiltroMediana(self):
         self.filtroMediana = self.submenuFiltrosDesfocar.addAction("Filtro &Mediana")
         self.filtroMediana.setShortcut("Ctrl+Shift+M")
@@ -303,15 +346,6 @@ class MyWindow(QMainWindow):
         self.filtroMediana.setChecked(False)
         self.filtroMediana.triggered.connect(lambda: self.transformarImagem(
             self.filtroMediana, 'Mediana', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-    def criarActionFiltroNegativo(self):
-        self.filtroNegativo = self.menuTransformacao.addAction("Filtro &Negativo")
-        self.filtroNegativo.setShortcut("Ctrl+Shift+N")
-        self.filtroNegativo.setDisabled(True)
-        self.filtroNegativo.setCheckable(True)
-        self.filtroNegativo.setChecked(False)
-        self.filtroNegativo.triggered.connect(lambda: self.transformarImagem(
-            self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionFiltroSharpen(self):
         self.filtroSharpen = self.submenuAjustarNitidez.addAction("Filtro S&harpen")
@@ -330,8 +364,17 @@ class MyWindow(QMainWindow):
         self.filtroSobel.setChecked(False)
         self.filtroSobel.triggered.connect(self.janelaValorLimiteSobel)
 
+    def criarActionInverterNegativo(self):
+        self.filtroNegativo = self.submenuInverterCores.addAction("&Negativo")
+        self.filtroNegativo.setShortcut("Ctrl+Shift+N")
+        self.filtroNegativo.setDisabled(True)
+        self.filtroNegativo.setCheckable(True)
+        self.filtroNegativo.setChecked(False)
+        self.filtroNegativo.triggered.connect(lambda: self.transformarImagem(
+            self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
     def criarActionTransformacaoLogaritmica(self):
-        self.transformacaoLogaritmica = self.menuTransformacao.addAction("Transformação &Logarítmica")
+        self.transformacaoLogaritmica = self.submenuRealcarIntensidade.addAction("Transformação &Logarítmica")
         self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
         self.transformacaoLogaritmica.setDisabled(True)
         self.transformacaoLogaritmica.setCheckable(True)
@@ -339,23 +382,15 @@ class MyWindow(QMainWindow):
         self.transformacaoLogaritmica.triggered.connect(lambda: self.transformarImagem(
             self.transformacaoLogaritmica, 'TransformacaoLogaritmica', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    def criarActionTransformacaoMorfologica(self):
-        self.transformacaoMorfologica = self.menuTransformacao.addAction("Transformações &Morfológicas")
-        self.transformacaoMorfologica.setShortcut("Ctrl+Shift+M")
-        self.transformacaoMorfologica.setDisabled(True)
-        self.transformacaoMorfologica.setCheckable(True)
-        self.transformacaoMorfologica.setChecked(False)
-        self.transformacaoMorfologica.triggered.connect(lambda: self.transformarImagem(
-            self.transformacaoMorfologica, 'BordasDilatacao', '.pbm', 'ArgumentoVazio'))
-
+    '''Criar listas para controlar visiblidade de itens dos menus'''
     def criarListasChecagemFiltros(self):
         self.listaFiltrosImgColoridaCinza = [self.submenuAjustarNitidez, self.filtroSharpen,
-                                             self.submenuAjustarLuminancia, self.correcaoGama,
-                                             self.submenuConversao, self.converterParaEscalaCinza,
-                                             self.converterParaPretoBranco, self.submenuFiltrosDesfocar,
-                                             self.submenuFiltroGaussiano, self.kernelGaussiano3x3,
-                                             self.kernelGaussiano5x5, self.kernelGaussiano7x7, self.filtroMediana,
-                                             self.filtroNegativo, self.transformacaoLogaritmica,
+                                             self.submenuRealcarIntensidade, self.correcaoGama,
+                                             self.transformacaoLogaritmica, self.submenuConversao,
+                                             self.converterParaEscalaCinza, self.converterParaPretoBranco,
+                                             self.submenuFiltrosDesfocar, self.submenuFiltroGaussiano,
+                                             self.kernelGaussiano3x3, self.kernelGaussiano5x5, self.kernelGaussiano7x7,
+                                             self.filtroMediana, self.submenuInverterCores, self.filtroNegativo,
                                              self.submenuFiltrosDeteccaoBordas, self.deteccaoDeBordasFiltroCrono,
                                              self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
                                              self.filtroSobel, self.submenuDecomposicaoCanaisRGB,
@@ -363,7 +398,8 @@ class MyWindow(QMainWindow):
 
         self.listaFiltrosImgPretoBranco = [self.submenuFiltrosDeteccaoBordas, self.deteccaoDeBordasFiltroCrono,
                                            self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
-                                           self.transformacaoMorfologica]
+                                           self.submenuMorfologicas, self.filtroAbertura, self.filtroDilatacao,
+                                           self.filtroErosao]
 
     '''Gerar Layouts'''
     def gerarLayouts(self):
@@ -430,7 +466,9 @@ class MyWindow(QMainWindow):
                 for filtro in self.listaFiltrosImgColoridaCinza:
                     filtro.setDisabled(False)
 
-            self.transformacaoMorfologica.setDisabled(True)
+            self.submenuMorfologicas.setDisabled(True)
+            self.filtroAbertura.setDisabled(True)
+            self.filtroDilatacao.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pgm':
             for filtro in self.listaFiltrosImgColoridaCinza:
@@ -440,7 +478,9 @@ class MyWindow(QMainWindow):
             self.decomporCanalG.setDisabled(True)
             self.decomporCanalB.setDisabled(True)
             self.converterParaEscalaCinza.setDisabled(True)
-            self.transformacaoMorfologica.setDisabled(True)
+            self.submenuMorfologicas.setDisabled(True)
+            self.filtroAbertura.setDisabled(True)
+            self.filtroDilatacao.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pbm':
             for filtro in self.listaFiltrosImgColoridaCinza:
@@ -514,7 +554,8 @@ class MyWindow(QMainWindow):
 
                 self.caixaMensagem.exec_()
 
-    '''Salva Cópia de Imagem com nome de arquivo e diretório escolhidos pelo usuário'''
+    '''Salva Imagem com nome de arquivo e diretório escolhidos pelo usuário. Procura pela imagem transformada, caso
+    não exista, é salvo a imagem original com o nome que o usuário escolher'''
     def salvarImagemComo(self):
         global extensaoImagemResultado
         try:
@@ -527,11 +568,11 @@ class MyWindow(QMainWindow):
                     self.parts = imagemSalvaComo.rpartition('/')
                     self.endereco = self.parts[0]
                     if self.endImagemResultado != '':
-                        shutil.copyfile(self.endImagemResultado, self.endereco + '/' +
+                        os.renames(self.endImagemResultado, self.endereco + '/' +
                                         os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
                                         extensaoImagemResultado)
                     else:
-                        shutil.copyfile(self.endImagemOriginal, self.endereco + '/' +
+                        os.renames(self.endImagemOriginal, self.endereco + '/' +
                                         os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
                                         self.extensaoImagemOriginal)
         except:

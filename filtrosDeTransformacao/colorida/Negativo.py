@@ -1,5 +1,8 @@
 # *-* coding: utf:8 -*-
 
+'''A negativa de uma imagem é obtida ao inverter-se a intensidade luminosa de todos
+os pontos da imagem, resultando em uma nova imagem com aspecto semelhante a um negativo fotográfico '''
+
 import sys
 import numpy as np
 

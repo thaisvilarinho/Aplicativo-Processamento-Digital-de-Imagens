@@ -1,5 +1,9 @@
 # *-* coding: utf:8 -*-
 
+'''A transformação logarítmica realce os tons escuros da imagem.
+Isso acontece porque ela mapeia uma faixa estreita de valores escuros na imagem de
+entrada em uma faixa mais ampla na imagem de saída, tornando a imagem mais clara'''
+
 import sys
 import numpy as np
 import math
