@@ -43,6 +43,7 @@ class MyWindow(QMainWindow):
         self.setGeometry(450, 150, 800, 600)
         self.initUI()
         self.listaFiltrosUsados = []
+
         self.show()
 
     '''Chamar métodos que criam a interface'''
@@ -182,6 +183,8 @@ class MyWindow(QMainWindow):
         self.criarActionDeteccaoDeBordasMarle()
         self.criarActionDeteccaoDeBordasPrometheus()
         self.criarActionFiltroSobel()
+        self.criarActionDeteccaoDeBordasDilatacao()
+        self.criarActionDeteccaoDeBordasErosao()
 
     def criarSubmenuFiltroGaussiano(self):
         # Submenu
@@ -210,6 +213,7 @@ class MyWindow(QMainWindow):
         self.criarActionFiltroAbertura()
         self.criarActionFiltroDilatacao()
         self.criarActionFiltroErosao()
+        self.criarActionFiltroFechamento()
 
     '''Criar Actions'''
 
@@ -272,12 +276,28 @@ class MyWindow(QMainWindow):
             self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
 
     def criarActionDeteccaoDeBordasCrono(self):
-        self.deteccaoDeBordasFiltroCrono = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Crono")
+        self.deteccaoDeBordasFiltroCrono = self.submenuFiltrosDeteccaoBordas.addAction("Filtro &Crono")
         self.deteccaoDeBordasFiltroCrono.setShortcut("Ctrl+Alt+C")
         self.deteccaoDeBordasFiltroCrono.setCheckable(True)
         self.deteccaoDeBordasFiltroCrono.setChecked(False)
         self.deteccaoDeBordasFiltroCrono.triggered.connect(lambda: self.transformarImagem(
             self.deteccaoDeBordasFiltroCrono, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+    def criarActionDeteccaoDeBordasDilatacao(self):
+        self.deteccaoDeBordasDilatacao = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Detecção com &Dilatação")
+        self.deteccaoDeBordasDilatacao.setShortcut("Ctrl+Alt+I")
+        self.deteccaoDeBordasDilatacao.setCheckable(True)
+        self.deteccaoDeBordasDilatacao.setChecked(False)
+        self.deteccaoDeBordasDilatacao.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasDilatacao, 'DeteccaoDeBordasDilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+    def criarActionDeteccaoDeBordasErosao(self):
+        self.deteccaoDeBordasErosao = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Detecção com &Erosão")
+        self.deteccaoDeBordasErosao.setShortcut("Ctrl+Alt+O")
+        self.deteccaoDeBordasErosao.setCheckable(True)
+        self.deteccaoDeBordasErosao.setChecked(False)
+        self.deteccaoDeBordasErosao.triggered.connect(lambda: self.transformarImagem(
+            self.deteccaoDeBordasErosao, 'DeteccaoDeBordasErosao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionDeteccaoDeBordasMarle(self):
         self.deteccaoDeBordasFiltroMarle = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Marle")
@@ -336,7 +356,16 @@ class MyWindow(QMainWindow):
         self.filtroErosao.setCheckable(True)
         self.filtroErosao.setChecked(False)
         self.filtroErosao.triggered.connect(lambda: self.transformarImagem(
-            self.filtroErosao, 'Dilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+            self.filtroErosao, 'Erosao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+    def criarActionFiltroFechamento(self):
+        self.filtroFechamento = self.submenuMorfologicas.addAction("&Fechamento")
+        self.filtroFechamento.setShortcut("Ctrl+Alt+F")
+        self.filtroFechamento.setDisabled(True)
+        self.filtroFechamento.setCheckable(True)
+        self.filtroFechamento.setChecked(False)
+        self.filtroFechamento.triggered.connect(lambda: self.transformarImagem(
+            self.filtroFechamento, 'Fechamento', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     def criarActionFiltroMediana(self):
         self.filtroMediana = self.submenuFiltrosDesfocar.addAction("Filtro &Mediana")
@@ -383,6 +412,7 @@ class MyWindow(QMainWindow):
             self.transformacaoLogaritmica, 'TransformacaoLogaritmica', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
     '''Criar listas para controlar visiblidade de itens dos menus'''
+
     def criarListasChecagemFiltros(self):
         self.listaFiltrosImgColoridaCinza = [self.submenuAjustarNitidez, self.filtroSharpen,
                                              self.submenuRealcarIntensidade, self.correcaoGama,
@@ -398,10 +428,12 @@ class MyWindow(QMainWindow):
 
         self.listaFiltrosImgPretoBranco = [self.submenuFiltrosDeteccaoBordas, self.deteccaoDeBordasFiltroCrono,
                                            self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
+                                           self.deteccaoDeBordasDilatacao, self.deteccaoDeBordasErosao,
                                            self.submenuMorfologicas, self.filtroAbertura, self.filtroDilatacao,
-                                           self.filtroErosao]
+                                           self.filtroErosao, self.filtroFechamento]
 
     '''Gerar Layouts'''
+
     def gerarLayouts(self):
         # Criando janela
         self.janelaAreaVisualizacao = QWidget(self)
@@ -426,6 +458,7 @@ class MyWindow(QMainWindow):
     '''Abre imagem selecionada pelo usuário e mantêm oculta diretório que mantem cópias de imagens anteriores que foram 
     transformadas, também solicita habilitar visibilidade dos menus e ações, remoção de cópias de imagens anteriores 
     transformadas, zera porcentagem da barra de progresso, defini pixmap da Imagem a ser exibida'''
+
     def abrirImagem(self):
         global imagemResultado
 
@@ -455,6 +488,7 @@ class MyWindow(QMainWindow):
         self.listaFiltrosUsados.clear()
 
     '''Contolar quais submenus e actions estão visíveis dependendo do tipo da imagem'''
+
     def alterarVisibilidadeMenus(self):
         global extensaoImagemResultado
 
@@ -469,6 +503,8 @@ class MyWindow(QMainWindow):
             self.submenuMorfologicas.setDisabled(True)
             self.filtroAbertura.setDisabled(True)
             self.filtroDilatacao.setDisabled(True)
+            self.deteccaoDeBordasDilatacao.setDisabled(True)
+            self.deteccaoDeBordasErosao.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pgm':
             for filtro in self.listaFiltrosImgColoridaCinza:
@@ -481,6 +517,8 @@ class MyWindow(QMainWindow):
             self.submenuMorfologicas.setDisabled(True)
             self.filtroAbertura.setDisabled(True)
             self.filtroDilatacao.setDisabled(True)
+            self.deteccaoDeBordasDilatacao.setDisabled(True)
+            self.deteccaoDeBordasErosao.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pbm':
             for filtro in self.listaFiltrosImgColoridaCinza:
@@ -491,12 +529,14 @@ class MyWindow(QMainWindow):
 
     '''Instancia classe ValorCorrecaoGama e pega valor fator gama 
     escolhido pelo usuário ao apertar botão enviar valor'''
+
     def janelaValorCorrecaoGama(self):
         self.janelaValorFatorGama = JanelaValorGama()
         self.janelaValorFatorGama.enviarValor.clicked.connect(self.pegarValorSliderGama)
 
     '''Pegar valor fator Gama escolhido pelo usuário e repassa-lo como linha de argumento para script 
     externo executar aplicação da correção gama na imagem'''
+
     def pegarValorSliderGama(self):
         valorFatorGama = str(self.janelaValorFatorGama.valorSlider)
         self.janelaValorFatorGama.close()
@@ -504,11 +544,13 @@ class MyWindow(QMainWindow):
 
     '''Instancia classe ValorCorrecaoGama e pega valor fator gama 
     escolhido pelo usuário ao apertar botão enviar valor'''
+
     def janelaValorLimiteSobel(self):
         self.janelaValorLimiteSobel = JanelaValorLimiteSobel()
         self.janelaValorLimiteSobel.enviarValor.clicked.connect(self.pegarValorLimiteSobel)
 
     '''Pegar valor fator Gama definido na classe ValorLimiteSobel'''
+
     def pegarValorLimiteSobel(self):
         valorLimiteSobel = str(self.janelaValorLimiteSobel.valorSlider)
         self.janelaValorLimiteSobel.close()
@@ -524,6 +566,7 @@ class MyWindow(QMainWindow):
         self.transformarImagem(self.converterParaPretoBranco, 'ConverterImagemBinaria', '.pbm', valorLimitePretoBranco)
 
     '''Exibe informações sobre aplicativo e imagem quando selecionado menu Sobre'''
+
     def mostrarInformacoesSobre(self):
 
         self.opcaoEscolhida = self.sender().text()
@@ -556,6 +599,7 @@ class MyWindow(QMainWindow):
 
     '''Salva Imagem com nome de arquivo e diretório escolhidos pelo usuário. Procura pela imagem transformada, caso
     não exista, é salvo a imagem original com o nome que o usuário escolher'''
+
     def salvarImagemComo(self):
         global extensaoImagemResultado
         try:
@@ -569,12 +613,12 @@ class MyWindow(QMainWindow):
                     self.endereco = self.parts[0]
                     if self.endImagemResultado != '':
                         os.renames(self.endImagemResultado, self.endereco + '/' +
-                                        os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
-                                        extensaoImagemResultado)
+                                   os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
+                                   extensaoImagemResultado)
                     else:
                         os.renames(self.endImagemOriginal, self.endereco + '/' +
-                                        os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
-                                        self.extensaoImagemOriginal)
+                                   os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
+                                   self.extensaoImagemOriginal)
         except:
             pass
 
@@ -596,6 +640,7 @@ class MyWindow(QMainWindow):
     controlando valores apresentados na barra de Progresso e de Status. Quando solicitado aplicação de mais de um 
     filtro na mesma imagem é gerado um cópia da imagem para não ter nomes repetidos nos argumentos utilizados
     nos scripts externos'''
+
     def transformarImagem(self, filtro, script, extensao, valorArgumento3):
 
         global porcentagemProgresso
