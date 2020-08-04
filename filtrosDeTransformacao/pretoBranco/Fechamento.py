@@ -3,104 +3,99 @@
 import sys
 import numpy as np
 
-# Checando os argumentos de linha de comando
-if __name__ == "__main__":
-    print(f'Quantos argumentos: {len(sys.argv)}')
-    for i, arg in enumerate(sys.argv):
-        print(f'Argument:{i}: {arg}')
 
-# Abrir os arquivos de entrada e de saída
-entrada = open(sys.argv[1], "r+")
-saida = open(sys.argv[2], "w+")
+def lerImagemEntrada():
+    entrada = open(sys.argv[1], "r+")
 
-linha = entrada.readline() # P1
-linha = entrada.readline() # Comentário
-linha = entrada.readline() # Dimensões da imagem
-dimensoes = linha.split() # Lista com as dimensões
-largura = int(dimensoes[0])
-altura = int(dimensoes[1])
-dimensoes = np.asarray(dimensoes, dtype=int)
+    linha = entrada.readline()  # P1
+    linha = entrada.readline()  # Comentário
+    linha = entrada.readline()  # Dimensões da imagem
+    dimensoes = linha.split()  # Lista com as dimensões
+    largura = int(dimensoes[0])
+    altura = int(dimensoes[1])
+    dimensoes = np.asarray(dimensoes, dtype=int)
 
-linhas = entrada.readlines()
-linhas = [x.strip() for x in linhas]
+    linhas = entrada.readlines()
+    linhas = [x.strip() for x in linhas]
+
+    stringLonga = concatenarLista(linhas)
+    imagem = np.array(list(stringLonga))
+    imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0]])
+    imagem = imagem.astype(int)
+
+    # Elemento Estruturante 3x3
+    # elemento = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
+
+    # Elemento Estruturante 5x5
+    # elemento = [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]]
+
+    # Elemento Estruturante 7x7
+    # elemento = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],
+    #            [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
+
+    # Elemento Estruturante 9x9
+    elemento = [[1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1]]
+
+    # Array numpy do elemento estruturante
+    elemento = np.asarray(elemento)
+
+    # Pegar pixel posição pixel central
+    es = int((len(elemento) - 1) / 2)
+
+    escreverImagemSaida(entrada, largura, altura, imagem, elemento, es)
 
 
-def concatenate_list_data(list):
+def concatenarLista(list):
     result = ''
     for element in list:
         result += str(element)
     return result
 
 
-longstring = concatenate_list_data(linhas)
-image = np.array(list(longstring))
-image = np.reshape(image, [dimensoes[1], dimensoes[0]])
-image = image.astype(int)
-
-#Elemento Estruturante 3x3
-elemento = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
-
-
-#Elemento Estruturante 5x5
-#elemento = [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]]
-
-
-#Elemento Estruturante 7x7
-#elemento = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],
-#            [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
-
-#Elemento Estruturante 9x9
-#elemento = [[1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
-#            [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1],
-#            [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1]]
-
-
-#Array numpy do elemento estruturante
-elemento = np.asarray(elemento)
-
-#Pegar pixel posição pixel central
-es = int((len(elemento) - 1) / 2)
-
-#escrevendo a imagem cópia
-saida.write("P1\n")
-saida.write("#Criado por Thais\n")
-saida.write(str(largura))
-saida.write(" ")
-saida.write(str(altura))
-saida.write("\n")
-
-
-#Fazer cópia da imagem original
-image2 = image.copy()
-
-#Fazer a dilatação
-for px in range(es, len(image)-es):
-    for py in range(es, len(image[1])-es):
-        if image[px][py] == 1:
-            for ex in range(len(elemento)):
-                for ey in range(len(elemento[1])):
-                    if elemento[ex][ey] == 1:
-                        image2[px - es + ex][py - es + ey] = 1
-
-
-#Fazer cópia da imagem dilatada
-image3 = image2.copy()
-
-# Fazer a erosão
-for px in range(es, len(image2)-es):
-    for py in range(es, len(image2[1])-es):
-        if image2[px][py] == 0:
-            for ex in range(len(elemento)):
-                for ey in range(len(elemento[1])):
-                    if elemento[ex][ey] == 1:
-                        image3[px - es + ex][py - es + ey] = 0
-
-
-for linha in range(len(image3)):
-    for coluna in range(len(image3[1])):
-        saida.write(str(image3[linha][coluna]))
+def escreverImagemSaida(entrada, largura, altura, imagem, elemento, es):
+    saida = open(sys.argv[2], "w+")
+    saida.write("P1\n")
+    saida.write("#Criado por Thais\n")
+    saida.write(str(largura))
+    saida.write(" ")
+    saida.write(str(altura))
     saida.write("\n")
 
-# fechar os dois arquivos.
-entrada.close()
-saida.close()
+    # Fazer cópia da imagem original
+    imagemTransformada = imagem.copy()
+
+    # Fazer a dilatação
+    for px in range(es, len(imagem) - es):
+        for py in range(es, len(imagem[1]) - es):
+            if imagem[px][py] == 1:
+                for ex in range(len(elemento)):
+                    for ey in range(len(elemento[1])):
+                        if elemento[ex][ey] == 1:
+                            imagemTransformada[px - es + ex][py - es + ey] = 1
+
+    # Fazer cópia da imagem dilatada
+    imagemSaida = imagemTransformada.copy()
+
+    # Fazer a erosão
+    for px in range(es, len(imagemTransformada) - es):
+        for py in range(es, len(imagemTransformada[1]) - es):
+            if imagemTransformada[px][py] == 0:
+                for ex in range(len(elemento)):
+                    for ey in range(len(elemento[1])):
+                        if elemento[ex][ey] == 1:
+                            imagemSaida[px - es + ex][py - es + ey] = 0
+
+    for linha in range(len(imagemSaida)):
+        for coluna in range(len(imagemSaida[1])):
+            saida.write(str(imagemSaida[linha][coluna]))
+            saida.write("\n")
+
+    # fechar os arquivos
+    entrada.close()
+    saida.close()
+
+
+if __name__ == "__main__":
+    lerImagemEntrada()
