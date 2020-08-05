@@ -18,10 +18,10 @@ class Pintar(QTableWidget):
         QTableWidget.paintEvent(self, event)
 
 
-class JanelaMatriz(QWidget):
+class JanelaMatrizElementoEstruturante(QWidget):
 
     def __init__(self, totalLinhas, totalColunas):
-        super(JanelaMatriz, self).__init__()
+        super(JanelaMatrizElementoEstruturante, self).__init__()
         self.setWindowTitle("Elemento Estruturante")
         self.setWindowIcon(QIcon("icones/icon.jpg"))
         self.setGeometry(700, 350, 250, 150)
@@ -86,6 +86,6 @@ class JanelaMatriz(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    fen = JanelaMatriz()
+    fen = JanelaMatrizElementoEstruturante()
     fen.show()
     sys.exit(app.exec_())
