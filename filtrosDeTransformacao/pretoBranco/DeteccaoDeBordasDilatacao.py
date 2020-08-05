@@ -23,22 +23,21 @@ def lerImagemEntrada():
     imagem = np.reshape(imagem, [dimensoes[1], dimensoes[0]])
     imagem = imagem.astype(int)
 
-    # Elemento Estruturante 3x3
-    # elemento = [[0, 0, 0], [0, 1, 1], [0, 0, 0]]
-
-    # Elemento Estruturante 5x5
-    # elemento = [[1, 0, 0, 0, 1], [1, 1, 1, 1, 1], [1, 0, 0, 1, 1], [0, 1, 1, 0, 0], [1, 0, 1, 1, 1]]
-
-    # Elemento Estruturante 7x7
-    # elemento = [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1],[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
-
-    # Elemento Estruturante 9x9
-    elemento = [[1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 0, 0, 0, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [1, 1, 1, 1, 1, 0, 1, 0, 1], [1, 1, 1, 1, 1, 1, 1, 0, 1], [1, 0, 1, 0, 1, 1, 1, 1, 1],
-                [0, 0, 0, 1, 1, 0, 0, 1, 1], [1, 0, 1, 0, 1, 1, 0, 1, 1], [1, 0, 0, 1, 0, 1, 1, 1, 1]]
-
-    # Array numpy do elemento estruturante
-    elemento = np.asarray(elemento)
+    # Elemento Estruturante
+    elemento = sys.argv[3]
+    elemento = np.array(list(elemento))
+    elemento = np.delete(elemento, 0)
+    matriz = 0
+    if len(elemento) == 9:
+        matriz = 3
+    elif len(elemento) == 25:
+        matriz = 5
+    elif len(elemento) == 49:
+        matriz = 7
+    elif len(elemento) == 81:
+        matriz = 9
+    elemento = elemento.reshape(matriz, matriz)
+    elemento = elemento.astype(int)
 
     # Pegar pixel posição pixel central
     es = int((len(elemento) - 1) / 2)
