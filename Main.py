@@ -256,6 +256,9 @@ class MyWindow(QMainWindow):
 
         # Actions do submenu
         self.criarActionAberturaElementoEstrutura3x3()
+        self.criarActionAberturaElementoEstrutura5x5()
+        self.criarActionAberturaElementoEstrutura7x7()
+        self.criarActionAberturaElementoEstrutura9x9()
 
         # Listar submenu
         self.listaFiltrosImgPretoBranco.append(self.submenuFiltroAbertura)
@@ -415,12 +418,39 @@ class MyWindow(QMainWindow):
         self.aberturaElementoEstruturante5x5.setChecked(False)
         self.aberturaElementoEstruturante5x5.triggered.connect(lambda:
                                                                self.criarJanelaDesenharElementoEstruturante(5, 5,
-                                                                                                            self.aberturaElementoEstruturante3x3,
-                                                                                                            'Abertura',
-                                                                                                            self.extensaoImagemOriginal))
+                                                               self.aberturaElementoEstruturante3x3, 'Abertura',
+                                                               self.extensaoImagemOriginal))
 
         # Listar action
         self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante5x5)
+
+    def criarActionAberturaElementoEstrutura7x7(self):
+        self.aberturaElementoEstruturante7x7 = self.submenuFiltroAbertura.addAction("Elemento Estruturante 7x7")
+        self.aberturaElementoEstruturante7x7.setShortcut("Ctrl+A+7")
+        self.aberturaElementoEstruturante7x7.setDisabled(True)
+        self.aberturaElementoEstruturante7x7.setCheckable(True)
+        self.aberturaElementoEstruturante7x7.setChecked(False)
+        self.aberturaElementoEstruturante7x7.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(7, 7,
+                                                               self.aberturaElementoEstruturante7x7, 'Abertura',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante7x7)
+
+    def criarActionAberturaElementoEstrutura9x9(self):
+        self.aberturaElementoEstruturante9x9 = self.submenuFiltroAbertura.addAction("Elemento Estruturante 9x9")
+        self.aberturaElementoEstruturante9x9.setShortcut("Ctrl+A+9")
+        self.aberturaElementoEstruturante9x9.setDisabled(True)
+        self.aberturaElementoEstruturante9x9.setCheckable(True)
+        self.aberturaElementoEstruturante9x9.setChecked(False)
+        self.aberturaElementoEstruturante9x9.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(9, 9,
+                                                               self.aberturaElementoEstruturante9x9, 'Abertura',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante9x9)
 
     def criarActionKernelGaussiano3x3(self):
         self.kernelGaussiano3x3 = self.submenuFiltroGaussiano.addAction("Matriz 3x3")

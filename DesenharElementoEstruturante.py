@@ -60,6 +60,7 @@ class JanelaMatriz(QWidget):
         self.tabela.setColumnCount(self.totalColunas)
         self.tabela.doubleClicked.connect(self.pintarCelula)
         self.tabela.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tabela.setToolTip("Dê duplo clique para colorir a célula")
 
         for linha in range(0, self.totalLinhas):
             self.tabela.setRowHeight(linha, 50)
