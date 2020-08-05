@@ -11,7 +11,7 @@ class JanelaValorLimitePretoBranco(QWidget):
 
     def __init__(self):
         super(JanelaValorLimitePretoBranco, self).__init__()
-        self.setWindowTitle("Correção Gama")
+        self.setWindowTitle("Conversão para Preto e Branco")
         self.setWindowIcon(QIcon("icones/icon.jpg"))
         self.setGeometry(700, 350, 250, 150)
         self.setFixedSize(250, 150)

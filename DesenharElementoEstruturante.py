@@ -20,15 +20,18 @@ class Pintar(QTableWidget):
 
 class JanelaMatriz(QWidget):
 
-    def __init__(self):
+    def __init__(self, totalLinhas, totalColunas):
         super(JanelaMatriz, self).__init__()
         self.setWindowTitle("Elemento Estruturante")
         self.setWindowIcon(QIcon("icones/icon.jpg"))
         self.setGeometry(700, 350, 250, 150)
-        self.totalLinhas = 9
-        self.totalColunas = 9
+        self.totalLinhas = totalLinhas
+        self.totalColunas = totalColunas
+        self.largura = 50 * totalLinhas
+        self.altura = 50 * totalColunas
         self.elemento = np.zeros((self.totalLinhas, self.totalColunas), dtype=int)
-        self.setFixedSize(49 * self.totalLinhas + 48, 55 * self.totalColunas + 31)  # 9x9
+        self.setFixedSize(self.largura + 39, self.altura + 76)
+        self.setWindowModality(Qt.ApplicationModal)
         self.setWindowModality(Qt.ApplicationModal)
         self.initUI()
         self.show()
@@ -43,7 +46,6 @@ class JanelaMatriz(QWidget):
 
         # Botão para capturar valor célula
         self.botaoEnviar = QPushButton("Enviar")
-        self.botaoEnviar.clicked.connect(self.pegarValor)
 
     def criarLayout(self):
         layout = QVBoxLayout()
@@ -75,11 +77,7 @@ class JanelaMatriz(QWidget):
     def pintarCelula(self):
         for celula in self.tabela.selectedItems():
             celula.setBackground(QColor(100, 100, 150))
-            print(celula.text(), celula.row(), celula.column())
-
-    def pegarValor(self):
-        for celula in self.tabela.selectedItems():
-            pass
+            self.elemento[celula.row()][celula.column()] = 1
 
 
 

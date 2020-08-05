@@ -7,6 +7,8 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QTimer
 from win32api import GetSystemMetrics
+
+from DesenharElementoEstruturante import JanelaMatriz
 from ValorCorrecaoGama import JanelaValorGama
 from ValorLimitePretoBranco import JanelaValorLimitePretoBranco
 from ValorLimiteSobel import JanelaValorLimiteSobel
@@ -49,8 +51,14 @@ class MyWindow(QMainWindow):
     '''Chamar métodos que criam a interface'''
 
     def initUI(self):
+        self.criarListasControleVisibilidadeItens()
         self.criarWidgets()
         self.gerarLayouts()
+
+    def criarListasControleVisibilidadeItens(self):
+        self.listaFiltrosImgColoridaCinza = []
+        self.listaFiltrosImgPretoBranco = []
+        self.listaRemoverFiltrosParaEscalaDeCinza = []
 
     '''Cria os widgets que encorporam o Menu e widgets que executaram ações'''
 
@@ -123,8 +131,6 @@ class MyWindow(QMainWindow):
         self.criarSubmenuRealcarIntensidade()
         self.criarSubmenuMorfologicas()
 
-        self.criarListasChecagemFiltros()
-
     '''Criar Submenus'''
 
     def criarSubmenuAjustarNitidez(self):
@@ -135,6 +141,9 @@ class MyWindow(QMainWindow):
         # Actions do submenu
         self.criarActionFiltroSharpen()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuAjustarNitidez)
+
     def criarSubmenuRealcarIntensidade(self):
         # Submenu
         self.submenuRealcarIntensidade = self.menuTransformacao.addMenu("Real&çar Intensidade")
@@ -144,6 +153,9 @@ class MyWindow(QMainWindow):
         self.criarActionCorrecaoGama()
         self.criarActionTransformacaoLogaritmica()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuRealcarIntensidade)
+
     def criarSubmenuConversao(self):
         # Submenu
         self.submenuConversao = self.menuTransformacao.addMenu("Con&verter")
@@ -152,6 +164,9 @@ class MyWindow(QMainWindow):
         # Actions do submenu
         self.criarActionConverterParaEscalaCinza()
         self.criarActionConverterParaPretoBranco()
+
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuConversao)
 
     def criarSubmenuDecomporCanaisRGB(self):
         # Submenu
@@ -163,6 +178,10 @@ class MyWindow(QMainWindow):
         self.criarActionDecomporCanalG()
         self.criarActionDecomporCanalB()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuDecomposicaoCanaisRGB)
+        self.listaRemoverFiltrosParaEscalaDeCinza.append(self.submenuDecomposicaoCanaisRGB)
+
     def criarSubmenuDesfocar(self):
         # Submenu
         self.submenuFiltrosDesfocar = self.menuTransformacao.addMenu("Des&focar")
@@ -172,6 +191,9 @@ class MyWindow(QMainWindow):
         self.criarSubmenuFiltroGaussiano()
         # Actions do submenu
         self.criarActionFiltroMediana()
+
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuFiltrosDesfocar)
 
     def criarSubmenuDeteccaoDeBordas(self):
         # Submenu
@@ -186,6 +208,10 @@ class MyWindow(QMainWindow):
         self.criarActionDeteccaoDeBordasDilatacao()
         self.criarActionDeteccaoDeBordasErosao()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuFiltrosDeteccaoBordas)
+        self.listaFiltrosImgPretoBranco.append(self.submenuFiltrosDeteccaoBordas)
+
     def criarSubmenuFiltroGaussiano(self):
         # Submenu
         self.submenuFiltroGaussiano = self.submenuFiltrosDesfocar.addMenu("Filtro Ga&ussiano")
@@ -196,6 +222,9 @@ class MyWindow(QMainWindow):
         self.criarActionKernelGaussiano5x5()
         self.criarActionKernelGaussiano7x7()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuFiltroGaussiano)
+
     def criarSubmenuInverterCores(self):
         # Submenu
         self.submenuInverterCores = self.menuTransformacao.addMenu("Inverter Cores")
@@ -204,27 +233,34 @@ class MyWindow(QMainWindow):
         # Actions do submenu
         self.criarActionInverterNegativo()
 
+        # Listar submenu
+        self.listaFiltrosImgColoridaCinza.append(self.submenuInverterCores)
+
     def criarSubmenuMorfologicas(self):
         # Submenu
         self.submenuMorfologicas = self.menuTransformacao.addMenu("&Morfológicas")
         self.submenuMorfologicas.setDisabled(True)
 
-        # Actions do submenu
-        self.criarActionFiltroAbertura()
+        # Submenus
+        self.criarSubmenuAbertura()
         self.criarActionFiltroDilatacao()
         self.criarActionFiltroErosao()
         self.criarActionFiltroFechamento()
 
-    '''Criar Actions'''
+        # Listar submenu
+        self.listaFiltrosImgPretoBranco.append(self.submenuMorfologicas)
 
-    def criarActionFiltroAbertura(self):
-        self.filtroAbertura = self.submenuMorfologicas.addAction("&Abertura")
-        self.filtroAbertura.setShortcut("Ctrl+Alt+A")
-        self.filtroAbertura.setDisabled(True)
-        self.filtroAbertura.setCheckable(True)
-        self.filtroAbertura.setChecked(False)
-        self.filtroAbertura.triggered.connect(lambda: self.transformarImagem(
-            self.filtroAbertura, 'Abertura', '.pbm', 'ArgumentoVazio'))
+    def criarSubmenuAbertura(self):
+        self.submenuFiltroAbertura = self.submenuMorfologicas.addMenu("&Abertura")
+        self.submenuFiltroAbertura.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionAberturaElementoEstrutura3x3()
+
+        # Listar submenu
+        self.listaFiltrosImgPretoBranco.append(self.submenuFiltroAbertura)
+
+    '''Criar Actions'''
 
     def criarActionConverterParaEscalaCinza(self):
         self.converterParaEscalaCinza = self.submenuConversao.addAction("&Tons de Cinza")
@@ -235,6 +271,10 @@ class MyWindow(QMainWindow):
         self.converterParaEscalaCinza.triggered.connect(lambda: self.transformarImagem(
             self.converterParaEscalaCinza, 'ConverterEscalaDeCinza', '.pgm', 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.converterParaEscalaCinza)
+        self.listaRemoverFiltrosParaEscalaDeCinza.append(self.converterParaEscalaCinza)
+
     def criarActionConverterParaPretoBranco(self):
         self.converterParaPretoBranco = self.submenuConversao.addAction("Tons Pre&to e Branco")
         self.converterParaPretoBranco.setShortcut("Ctrl+Shift+T")
@@ -242,6 +282,9 @@ class MyWindow(QMainWindow):
         self.converterParaPretoBranco.setCheckable(True)
         self.converterParaPretoBranco.setChecked(False)
         self.converterParaPretoBranco.triggered.connect(self.janelaValorLimitePretoBranco)
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.converterParaPretoBranco)
 
     def criarActionCorrecaoGama(self):
         self.correcaoGama = self.submenuRealcarIntensidade.addAction("Correção &Gama")
@@ -251,6 +294,9 @@ class MyWindow(QMainWindow):
         self.correcaoGama.setChecked(False)
         self.correcaoGama.triggered.connect(self.janelaValorCorrecaoGama)
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.correcaoGama)
+
     def criarActionDecomporCanalR(self):
         self.decomporCanalR = self.submenuDecomposicaoCanaisRGB.addAction("Vermelho")
         self.decomporCanalR.setShortcut("Ctrl+Alt+R")
@@ -258,6 +304,10 @@ class MyWindow(QMainWindow):
         self.decomporCanalR.setChecked(False)
         self.decomporCanalR.triggered.connect(lambda: self.transformarImagem(
             self.decomporCanalR, 'CamadaR', '.ppm', 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.decomporCanalR)
+        self.listaRemoverFiltrosParaEscalaDeCinza.append(self.decomporCanalR)
 
     def criarActionDecomporCanalG(self):
         self.decomporCanalG = self.submenuDecomposicaoCanaisRGB.addAction("Verde")
@@ -267,6 +317,10 @@ class MyWindow(QMainWindow):
         self.decomporCanalG.triggered.connect(lambda: self.transformarImagem(
             self.decomporCanalG, 'CamadaG', '.ppm', 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.decomporCanalG)
+        self.listaRemoverFiltrosParaEscalaDeCinza.append(self.decomporCanalG)
+
     def criarActionDecomporCanalB(self):
         self.decomporCanalB = self.submenuDecomposicaoCanaisRGB.addAction("Azul")
         self.decomporCanalB.setShortcut("Ctrl+Alt+B")
@@ -274,6 +328,10 @@ class MyWindow(QMainWindow):
         self.decomporCanalB.setChecked(False)
         self.decomporCanalB.triggered.connect(lambda: self.transformarImagem(
             self.decomporCanalB, 'CamadaB', '.ppm', 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.decomporCanalB)
+        self.listaRemoverFiltrosParaEscalaDeCinza.append(self.decomporCanalB)
 
     def criarActionDeteccaoDeBordasCrono(self):
         self.deteccaoDeBordasFiltroCrono = self.submenuFiltrosDeteccaoBordas.addAction("Filtro &Crono")
@@ -283,6 +341,10 @@ class MyWindow(QMainWindow):
         self.deteccaoDeBordasFiltroCrono.triggered.connect(lambda: self.transformarImagem(
             self.deteccaoDeBordasFiltroCrono, 'DeteccaoDeBordasCrono', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.deteccaoDeBordasFiltroCrono)
+        self.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasFiltroCrono)
+
     def criarActionDeteccaoDeBordasDilatacao(self):
         self.deteccaoDeBordasDilatacao = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Detecção com &Dilatação")
         self.deteccaoDeBordasDilatacao.setShortcut("Ctrl+Alt+I")
@@ -290,6 +352,9 @@ class MyWindow(QMainWindow):
         self.deteccaoDeBordasDilatacao.setChecked(False)
         self.deteccaoDeBordasDilatacao.triggered.connect(lambda: self.transformarImagem(
             self.deteccaoDeBordasDilatacao, 'DeteccaoDeBordasDilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasDilatacao)
 
     def criarActionDeteccaoDeBordasErosao(self):
         self.deteccaoDeBordasErosao = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Detecção com &Erosão")
@@ -299,6 +364,9 @@ class MyWindow(QMainWindow):
         self.deteccaoDeBordasErosao.triggered.connect(lambda: self.transformarImagem(
             self.deteccaoDeBordasErosao, 'DeteccaoDeBordasErosao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasErosao)
+
     def criarActionDeteccaoDeBordasMarle(self):
         self.deteccaoDeBordasFiltroMarle = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Marle")
         self.deteccaoDeBordasFiltroMarle.setShortcut("Ctrl+Alt+M")
@@ -306,6 +374,10 @@ class MyWindow(QMainWindow):
         self.deteccaoDeBordasFiltroMarle.setChecked(False)
         self.deteccaoDeBordasFiltroMarle.triggered.connect(lambda: self.transformarImagem(
             self.deteccaoDeBordasFiltroMarle, 'DeteccaoDeBordasMarle', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.deteccaoDeBordasFiltroMarle)
+        self.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasFiltroMarle)
 
     def criarActionDeteccaoDeBordasPrometheus(self):
         self.deteccaoDeBordasFiltroPrometheus = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Prometheus")
@@ -316,6 +388,40 @@ class MyWindow(QMainWindow):
             self.deteccaoDeBordasFiltroPrometheus, 'DeteccaoDeBordasPrometheus', self.extensaoImagemOriginal,
             'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.deteccaoDeBordasFiltroPrometheus)
+        self.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasFiltroPrometheus)
+
+    def criarActionAberturaElementoEstrutura3x3(self):
+        self.aberturaElementoEstruturante3x3 = self.submenuFiltroAbertura.addAction("Elemento Estruturante 3x3")
+        self.aberturaElementoEstruturante3x3.setShortcut("Ctrl+A+3")
+        self.aberturaElementoEstruturante3x3.setDisabled(True)
+        self.aberturaElementoEstruturante3x3.setCheckable(True)
+        self.aberturaElementoEstruturante3x3.setChecked(False)
+        self.aberturaElementoEstruturante3x3.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(3, 3,
+                                                                                                            self.aberturaElementoEstruturante3x3,
+                                                                                                            'Abertura',
+                                                                                                            self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante3x3)
+
+    def criarActionAberturaElementoEstrutura5x5(self):
+        self.aberturaElementoEstruturante5x5 = self.submenuFiltroAbertura.addAction("Elemento Estruturante 5x5")
+        self.aberturaElementoEstruturante5x5.setShortcut("Ctrl+A+5")
+        self.aberturaElementoEstruturante5x5.setDisabled(True)
+        self.aberturaElementoEstruturante5x5.setCheckable(True)
+        self.aberturaElementoEstruturante5x5.setChecked(False)
+        self.aberturaElementoEstruturante5x5.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(5, 5,
+                                                                                                            self.aberturaElementoEstruturante3x3,
+                                                                                                            'Abertura',
+                                                                                                            self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante5x5)
+
     def criarActionKernelGaussiano3x3(self):
         self.kernelGaussiano3x3 = self.submenuFiltroGaussiano.addAction("Matriz 3x3")
         self.kernelGaussiano3x3.setShortcut("Ctrl+Alt+3")
@@ -323,6 +429,9 @@ class MyWindow(QMainWindow):
         self.kernelGaussiano3x3.setChecked(False)
         self.kernelGaussiano3x3.triggered.connect(lambda: self.transformarImagem(
             self.kernelGaussiano3x3, 'Gaussiano3x3', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.kernelGaussiano3x3)
 
     def criarActionKernelGaussiano5x5(self):
         self.kernelGaussiano5x5 = self.submenuFiltroGaussiano.addAction("Matriz 5x5")
@@ -332,6 +441,9 @@ class MyWindow(QMainWindow):
         self.kernelGaussiano5x5.triggered.connect(lambda: self.transformarImagem(
             self.kernelGaussiano5x5, 'Gaussiano5x5', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.kernelGaussiano5x5)
+
     def criarActionKernelGaussiano7x7(self):
         self.kernelGaussiano7x7 = self.submenuFiltroGaussiano.addAction("Matriz 7x7")
         self.kernelGaussiano7x7.setShortcut("Ctrl+Alt+7")
@@ -339,6 +451,9 @@ class MyWindow(QMainWindow):
         self.kernelGaussiano7x7.setChecked(False)
         self.kernelGaussiano7x7.triggered.connect(lambda: self.transformarImagem(
             self.kernelGaussiano7x7, 'Gaussiano7x7', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.kernelGaussiano7x7)
 
     def criarActionFiltroDilatacao(self):
         self.filtroDilatacao = self.submenuMorfologicas.addAction("&Dilatação")
@@ -349,6 +464,9 @@ class MyWindow(QMainWindow):
         self.filtroDilatacao.triggered.connect(lambda: self.transformarImagem(
             self.filtroDilatacao, 'Dilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.filtroDilatacao)
+
     def criarActionFiltroErosao(self):
         self.filtroErosao = self.submenuMorfologicas.addAction("&Erosão")
         self.filtroErosao.setShortcut("Ctrl+Alt+E")
@@ -357,6 +475,9 @@ class MyWindow(QMainWindow):
         self.filtroErosao.setChecked(False)
         self.filtroErosao.triggered.connect(lambda: self.transformarImagem(
             self.filtroErosao, 'Erosao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.filtroErosao)
 
     def criarActionFiltroFechamento(self):
         self.filtroFechamento = self.submenuMorfologicas.addAction("&Fechamento")
@@ -367,6 +488,9 @@ class MyWindow(QMainWindow):
         self.filtroFechamento.triggered.connect(lambda: self.transformarImagem(
             self.filtroFechamento, 'Fechamento', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.filtroFechamento)
+
     def criarActionFiltroMediana(self):
         self.filtroMediana = self.submenuFiltrosDesfocar.addAction("Filtro &Mediana")
         self.filtroMediana.setShortcut("Ctrl+Shift+M")
@@ -375,6 +499,9 @@ class MyWindow(QMainWindow):
         self.filtroMediana.setChecked(False)
         self.filtroMediana.triggered.connect(lambda: self.transformarImagem(
             self.filtroMediana, 'Mediana', self.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.filtroMediana)
 
     def criarActionFiltroSharpen(self):
         self.filtroSharpen = self.submenuAjustarNitidez.addAction("Filtro S&harpen")
@@ -385,6 +512,9 @@ class MyWindow(QMainWindow):
         self.filtroSharpen.triggered.connect(lambda: self.transformarImagem(
             self.filtroSharpen, 'Sharpen', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.filtroSharpen)
+
     def criarActionFiltroSobel(self):
         self.filtroSobel = self.submenuFiltrosDeteccaoBordas.addAction("Filtro S&obel")
         self.filtroSobel.setShortcut("Ctrl+Shift+O")
@@ -392,6 +522,9 @@ class MyWindow(QMainWindow):
         self.filtroSobel.setCheckable(True)
         self.filtroSobel.setChecked(False)
         self.filtroSobel.triggered.connect(self.janelaValorLimiteSobel)
+
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.filtroSobel)
 
     def criarActionInverterNegativo(self):
         self.filtroNegativo = self.submenuInverterCores.addAction("&Negativo")
@@ -402,6 +535,9 @@ class MyWindow(QMainWindow):
         self.filtroNegativo.triggered.connect(lambda: self.transformarImagem(
             self.filtroNegativo, 'Negativo', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.filtroNegativo)
+
     def criarActionTransformacaoLogaritmica(self):
         self.transformacaoLogaritmica = self.submenuRealcarIntensidade.addAction("Transformação &Logarítmica")
         self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
@@ -411,26 +547,8 @@ class MyWindow(QMainWindow):
         self.transformacaoLogaritmica.triggered.connect(lambda: self.transformarImagem(
             self.transformacaoLogaritmica, 'TransformacaoLogaritmica', self.extensaoImagemOriginal, 'ArgumentoVazio'))
 
-    '''Criar listas para controlar visiblidade de itens dos menus'''
-
-    def criarListasChecagemFiltros(self):
-        self.listaFiltrosImgColoridaCinza = [self.submenuAjustarNitidez, self.filtroSharpen,
-                                             self.submenuRealcarIntensidade, self.correcaoGama,
-                                             self.transformacaoLogaritmica, self.submenuConversao,
-                                             self.converterParaEscalaCinza, self.converterParaPretoBranco,
-                                             self.submenuFiltrosDesfocar, self.submenuFiltroGaussiano,
-                                             self.kernelGaussiano3x3, self.kernelGaussiano5x5, self.kernelGaussiano7x7,
-                                             self.filtroMediana, self.submenuInverterCores, self.filtroNegativo,
-                                             self.submenuFiltrosDeteccaoBordas, self.deteccaoDeBordasFiltroCrono,
-                                             self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
-                                             self.filtroSobel, self.submenuDecomposicaoCanaisRGB,
-                                             self.decomporCanalR, self.decomporCanalG, self.decomporCanalB]
-
-        self.listaFiltrosImgPretoBranco = [self.submenuFiltrosDeteccaoBordas, self.deteccaoDeBordasFiltroCrono,
-                                           self.deteccaoDeBordasFiltroMarle, self.deteccaoDeBordasFiltroPrometheus,
-                                           self.deteccaoDeBordasDilatacao, self.deteccaoDeBordasErosao,
-                                           self.submenuMorfologicas, self.filtroAbertura, self.filtroDilatacao,
-                                           self.filtroErosao, self.filtroFechamento]
+        # Listar action
+        self.listaFiltrosImgColoridaCinza.append(self.transformacaoLogaritmica)
 
     '''Gerar Layouts'''
 
@@ -500,25 +618,20 @@ class MyWindow(QMainWindow):
                 for filtro in self.listaFiltrosImgColoridaCinza:
                     filtro.setDisabled(False)
 
-            self.submenuMorfologicas.setDisabled(True)
-            self.filtroAbertura.setDisabled(True)
-            self.filtroDilatacao.setDisabled(True)
-            self.deteccaoDeBordasDilatacao.setDisabled(True)
-            self.deteccaoDeBordasErosao.setDisabled(True)
+                for filtro in self.listaFiltrosImgPretoBranco:
+                    if filtro not in self.listaFiltrosImgColoridaCinza:
+                        filtro.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pgm':
             for filtro in self.listaFiltrosImgColoridaCinza:
-                filtro.setDisabled(False)
-            self.submenuDecomposicaoCanaisRGB.setDisabled(True)
-            self.decomporCanalR.setDisabled(True)
-            self.decomporCanalG.setDisabled(True)
-            self.decomporCanalB.setDisabled(True)
-            self.converterParaEscalaCinza.setDisabled(True)
-            self.submenuMorfologicas.setDisabled(True)
-            self.filtroAbertura.setDisabled(True)
-            self.filtroDilatacao.setDisabled(True)
-            self.deteccaoDeBordasDilatacao.setDisabled(True)
-            self.deteccaoDeBordasErosao.setDisabled(True)
+                if filtro in self.listaRemoverFiltrosParaEscalaDeCinza:
+                    filtro.setDisabled(True)
+                else:
+                    filtro.setDisabled(False)
+
+            for filtro in self.listaFiltrosImgPretoBranco:
+                if filtro not in self.listaFiltrosImgColoridaCinza:
+                    filtro.setDisabled(True)
 
         elif self.extensaoImagemOriginal == '.pbm':
             for filtro in self.listaFiltrosImgColoridaCinza:
@@ -526,6 +639,22 @@ class MyWindow(QMainWindow):
 
             for filtro in self.listaFiltrosImgPretoBranco:
                 filtro.setDisabled(False)
+
+    def criarJanelaDesenharElementoEstruturante(self, totalLinhas, totalColunas, filtro, script, extensao):
+        self.janelaDesenharElementoEstruturante = JanelaMatriz(totalLinhas, totalColunas)
+        self.janelaDesenharElementoEstruturante.botaoEnviar.clicked.connect \
+            (lambda: self.pegarMatrizElementoEstruturante(filtro, script, extensao))
+
+    def pegarMatrizElementoEstruturante(self, filtro, script, extensao):
+        stringMatrizElementoEstruturante = ''
+        matrizElementoEstruturante = self.janelaDesenharElementoEstruturante.elemento
+
+        for linha in range(len(matrizElementoEstruturante)):
+            for coluna in range(len(matrizElementoEstruturante[linha])):
+                stringMatrizElementoEstruturante += str(matrizElementoEstruturante[linha][coluna])
+
+        self.janelaDesenharElementoEstruturante.close()
+        self.transformarImagem(filtro, script, extensao, stringMatrizElementoEstruturante)
 
     '''Instancia classe ValorCorrecaoGama e pega valor fator gama 
     escolhido pelo usuário ao apertar botão enviar valor'''
@@ -675,7 +804,6 @@ class MyWindow(QMainWindow):
             self.argumentos = 'python ' + self.script + ' \"' + self.imagemEntrada + '\" ' + \
                               imagemResultado + extensaoImagemResultado + ' \" ' + valorArgumento3
             self.executarTransformacao = subprocess.run(self.argumentos, shell=True)
-
             while porcentagemProgresso < 100:
                 if self.executarTransformacao is not None:
                     porcentagemProgresso += 0.001
