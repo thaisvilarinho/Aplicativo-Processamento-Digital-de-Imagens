@@ -243,9 +243,9 @@ class MyWindow(QMainWindow):
 
         # Submenus
         self.criarSubmenuAbertura()
-        self.criarActionFiltroDilatacao()
-        self.criarActionFiltroErosao()
-        self.criarActionFiltroFechamento()
+        self.criarSubmenuDilatacao()
+        self.criarSubmenuErosao()
+        self.criarSubmenuFechamento()
 
         # Listar submenu
         self.listaFiltrosImgPretoBranco.append(self.submenuMorfologicas)
@@ -262,6 +262,45 @@ class MyWindow(QMainWindow):
 
         # Listar submenu
         self.listaFiltrosImgPretoBranco.append(self.submenuFiltroAbertura)
+
+    def criarSubmenuDilatacao(self):
+        self.submenuFiltroDilatacao = self.submenuMorfologicas.addMenu("&Dilatação")
+        self.submenuFiltroDilatacao.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionDilatacaoElementoEstrutura3x3()
+        self.criarActionDilatacaoElementoEstrutura5x5()
+        self.criarActionDilatacaoElementoEstrutura7x7()
+        self.criarActionDilatacaoElementoEstrutura9x9()
+
+        # Listar submenu
+        self.listaFiltrosImgPretoBranco.append(self.submenuFiltroDilatacao)
+
+    def criarSubmenuErosao(self):
+        self.submenuFiltroErosao = self.submenuMorfologicas.addMenu("&Erosão")
+        self.submenuFiltroErosao.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionErosaoElementoEstrutura3x3()
+        self.criarActionErosaoElementoEstrutura5x5()
+        self.criarActionErosaoElementoEstrutura7x7()
+        self.criarActionErosaoElementoEstrutura9x9()
+
+        # Listar submenu
+        self.listaFiltrosImgPretoBranco.append(self.submenuFiltroErosao)
+
+    def criarSubmenuFechamento(self):
+        self.submenuFiltroFechamento = self.submenuMorfologicas.addMenu("&Fechamento")
+        self.submenuFiltroFechamento.setDisabled(True)
+
+        # Actions do submenu
+        self.criarActionFechamentoElementoEstrutura3x3()
+        self.criarActionFechamentoElementoEstrutura5x5()
+        self.criarActionFechamentoElementoEstrutura7x7()
+        self.criarActionFechamentoElementoEstrutura9x9()
+
+        # Listar submenu
+        self.listaFiltrosImgPretoBranco.append(self.submenuFiltroFechamento)
 
     '''Criar Actions'''
 
@@ -403,9 +442,8 @@ class MyWindow(QMainWindow):
         self.aberturaElementoEstruturante3x3.setChecked(False)
         self.aberturaElementoEstruturante3x3.triggered.connect(lambda:
                                                                self.criarJanelaDesenharElementoEstruturante(3, 3,
-                                                                                                            self.aberturaElementoEstruturante3x3,
-                                                                                                            'Abertura',
-                                                                                                            self.extensaoImagemOriginal))
+                                                               self.aberturaElementoEstruturante3x3, 'Abertura',
+                                                               self.extensaoImagemOriginal))
 
         # Listar action
         self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante3x3)
@@ -418,7 +456,7 @@ class MyWindow(QMainWindow):
         self.aberturaElementoEstruturante5x5.setChecked(False)
         self.aberturaElementoEstruturante5x5.triggered.connect(lambda:
                                                                self.criarJanelaDesenharElementoEstruturante(5, 5,
-                                                               self.aberturaElementoEstruturante3x3, 'Abertura',
+                                                               self.aberturaElementoEstruturante5x5, 'Abertura',
                                                                self.extensaoImagemOriginal))
 
         # Listar action
@@ -452,6 +490,174 @@ class MyWindow(QMainWindow):
         # Listar action
         self.listaFiltrosImgPretoBranco.append(self.aberturaElementoEstruturante9x9)
 
+    def criarActionDilatacaoElementoEstrutura3x3(self):
+        self.dilatacaoElementoEstruturante3x3 = self.submenuFiltroDilatacao.addAction("Elemento Estruturante 3x3")
+        self.dilatacaoElementoEstruturante3x3.setShortcut("Ctrl+D+3")
+        self.dilatacaoElementoEstruturante3x3.setDisabled(True)
+        self.dilatacaoElementoEstruturante3x3.setCheckable(True)
+        self.dilatacaoElementoEstruturante3x3.setChecked(False)
+        self.dilatacaoElementoEstruturante3x3.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(3, 3,
+                                                               self.dilatacaoElementoEstruturante3x3, 'Dilatacao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.dilatacaoElementoEstruturante3x3)
+
+    def criarActionDilatacaoElementoEstrutura5x5(self):
+        self.dilatacaoElementoEstruturante5x5 = self.submenuFiltroDilatacao.addAction("Elemento Estruturante 5x5")
+        self.dilatacaoElementoEstruturante5x5.setShortcut("Ctrl+D+5")
+        self.dilatacaoElementoEstruturante5x5.setDisabled(True)
+        self.dilatacaoElementoEstruturante5x5.setCheckable(True)
+        self.dilatacaoElementoEstruturante5x5.setChecked(False)
+        self.dilatacaoElementoEstruturante5x5.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(5, 5,
+                                                               self.dilatacaoElementoEstruturante5x5, 'Dilatacao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.dilatacaoElementoEstruturante5x5)
+
+    def criarActionDilatacaoElementoEstrutura7x7(self):
+        self.dilatacaoElementoEstruturante7x7 = self.submenuFiltroDilatacao.addAction("Elemento Estruturante 7x7")
+        self.dilatacaoElementoEstruturante7x7.setShortcut("Ctrl+D+7")
+        self.dilatacaoElementoEstruturante7x7.setDisabled(True)
+        self.dilatacaoElementoEstruturante7x7.setCheckable(True)
+        self.dilatacaoElementoEstruturante7x7.setChecked(False)
+        self.dilatacaoElementoEstruturante7x7.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(7, 7,
+                                                               self.dilatacaoElementoEstruturante7x7, 'Dilatacao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.dilatacaoElementoEstruturante7x7)
+
+    def criarActionDilatacaoElementoEstrutura9x9(self):
+        self.dilatacaoElementoEstruturante9x9 = self.submenuFiltroDilatacao.addAction("Elemento Estruturante 9x9")
+        self.dilatacaoElementoEstruturante9x9.setShortcut("Ctrl+D+9")
+        self.dilatacaoElementoEstruturante9x9.setDisabled(True)
+        self.dilatacaoElementoEstruturante9x9.setCheckable(True)
+        self.dilatacaoElementoEstruturante9x9.setChecked(False)
+        self.dilatacaoElementoEstruturante9x9.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(9, 9,
+                                                               self.dilatacaoElementoEstruturante9x9, 'Dilatacao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.dilatacaoElementoEstruturante9x9)
+
+    def criarActionErosaoElementoEstrutura3x3(self):
+        self.erosaoElementoEstruturante3x3 = self.submenuFiltroErosao.addAction("Elemento Estruturante 3x3")
+        self.erosaoElementoEstruturante3x3.setShortcut("Ctrl+E+3")
+        self.erosaoElementoEstruturante3x3.setDisabled(True)
+        self.erosaoElementoEstruturante3x3.setCheckable(True)
+        self.erosaoElementoEstruturante3x3.setChecked(False)
+        self.erosaoElementoEstruturante3x3.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(3, 3,
+                                                               self.erosaoElementoEstruturante3x3, 'Erosao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.erosaoElementoEstruturante3x3)
+
+    def criarActionErosaoElementoEstrutura5x5(self):
+        self.erosaoElementoEstruturante5x5 = self.submenuFiltroErosao.addAction("Elemento Estruturante 5x5")
+        self.erosaoElementoEstruturante5x5.setShortcut("Ctrl+E+5")
+        self.erosaoElementoEstruturante5x5.setDisabled(True)
+        self.erosaoElementoEstruturante5x5.setCheckable(True)
+        self.erosaoElementoEstruturante5x5.setChecked(False)
+        self.erosaoElementoEstruturante5x5.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(5, 5,
+                                                               self.erosaoElementoEstruturante5x5, 'Erosao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.erosaoElementoEstruturante5x5)
+
+    def criarActionErosaoElementoEstrutura7x7(self):
+        self.erosaoElementoEstruturante7x7 = self.submenuFiltroErosao.addAction("Elemento Estruturante 7x7")
+        self.erosaoElementoEstruturante7x7.setShortcut("Ctrl+E+7")
+        self.erosaoElementoEstruturante7x7.setDisabled(True)
+        self.erosaoElementoEstruturante7x7.setCheckable(True)
+        self.erosaoElementoEstruturante7x7.setChecked(False)
+        self.erosaoElementoEstruturante7x7.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(7, 7,
+                                                               self.erosaoElementoEstruturante7x7, 'Erosao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.erosaoElementoEstruturante7x7)
+
+    def criarActionErosaoElementoEstrutura9x9(self):
+        self.erosaoElementoEstruturante9x9 = self.submenuFiltroErosao.addAction("Elemento Estruturante 9x9")
+        self.erosaoElementoEstruturante9x9.setShortcut("Ctrl+E+9")
+        self.erosaoElementoEstruturante9x9.setDisabled(True)
+        self.erosaoElementoEstruturante9x9.setCheckable(True)
+        self.erosaoElementoEstruturante9x9.setChecked(False)
+        self.erosaoElementoEstruturante9x9.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(9, 9,
+                                                               self.erosaoElementoEstruturante9x9, 'Erosao',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.erosaoElementoEstruturante9x9)
+
+    def criarActionFechamentoElementoEstrutura3x3(self):
+        self.fechamentoElementoEstruturante3x3 = self.submenuFiltroFechamento.addAction("Elemento Estruturante 3x3")
+        self.fechamentoElementoEstruturante3x3.setShortcut("Ctrl+F+3")
+        self.fechamentoElementoEstruturante3x3.setDisabled(True)
+        self.fechamentoElementoEstruturante3x3.setCheckable(True)
+        self.fechamentoElementoEstruturante3x3.setChecked(False)
+        self.fechamentoElementoEstruturante3x3.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(3, 3,
+                                                               self.fechamentoElementoEstruturante3x3, 'Fechamento',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.fechamentoElementoEstruturante3x3)
+
+    def criarActionFechamentoElementoEstrutura5x5(self):
+        self.fechamentoElementoEstruturante5x5 = self.submenuFiltroFechamento.addAction("Elemento Estruturante 5x5")
+        self.fechamentoElementoEstruturante5x5.setShortcut("Ctrl+F+5")
+        self.fechamentoElementoEstruturante5x5.setDisabled(True)
+        self.fechamentoElementoEstruturante5x5.setCheckable(True)
+        self.fechamentoElementoEstruturante5x5.setChecked(False)
+        self.fechamentoElementoEstruturante5x5.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(5, 5,
+                                                               self.fechamentoElementoEstruturante5x5, 'Fechamento',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.fechamentoElementoEstruturante5x5)
+
+    def criarActionFechamentoElementoEstrutura7x7(self):
+        self.fechamentoElementoEstruturante7x7 = self.submenuFiltroFechamento.addAction("Elemento Estruturante 7x7")
+        self.fechamentoElementoEstruturante7x7.setShortcut("Ctrl+F+7")
+        self.fechamentoElementoEstruturante7x7.setDisabled(True)
+        self.fechamentoElementoEstruturante7x7.setCheckable(True)
+        self.fechamentoElementoEstruturante7x7.setChecked(False)
+        self.fechamentoElementoEstruturante7x7.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(7, 7,
+                                                               self.fechamentoElementoEstruturante7x7, 'Fechamento',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.fechamentoElementoEstruturante7x7)
+
+    def criarActionFechamentoElementoEstrutura9x9(self):
+        self.fechamentoElementoEstruturante9x9 = self.submenuFiltroFechamento.addAction("Elemento Estruturante 9x9")
+        self.fechamentoElementoEstruturante9x9.setShortcut("Ctrl+F+9")
+        self.fechamentoElementoEstruturante9x9.setDisabled(True)
+        self.fechamentoElementoEstruturante9x9.setCheckable(True)
+        self.fechamentoElementoEstruturante9x9.setChecked(False)
+        self.fechamentoElementoEstruturante9x9.triggered.connect(lambda:
+                                                               self.criarJanelaDesenharElementoEstruturante(9, 9,
+                                                               self.fechamentoElementoEstruturante9x9, 'Fechamento',
+                                                               self.extensaoImagemOriginal))
+
+        # Listar action
+        self.listaFiltrosImgPretoBranco.append(self.fechamentoElementoEstruturante9x9)
+
     def criarActionKernelGaussiano3x3(self):
         self.kernelGaussiano3x3 = self.submenuFiltroGaussiano.addAction("Matriz 3x3")
         self.kernelGaussiano3x3.setShortcut("Ctrl+Alt+3")
@@ -484,42 +690,6 @@ class MyWindow(QMainWindow):
 
         # Listar action
         self.listaFiltrosImgColoridaCinza.append(self.kernelGaussiano7x7)
-
-    def criarActionFiltroDilatacao(self):
-        self.filtroDilatacao = self.submenuMorfologicas.addAction("&Dilatação")
-        self.filtroDilatacao.setShortcut("Ctrl+Alt+D")
-        self.filtroDilatacao.setDisabled(True)
-        self.filtroDilatacao.setCheckable(True)
-        self.filtroDilatacao.setChecked(False)
-        self.filtroDilatacao.triggered.connect(lambda: self.transformarImagem(
-            self.filtroDilatacao, 'Dilatacao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-        # Listar action
-        self.listaFiltrosImgPretoBranco.append(self.filtroDilatacao)
-
-    def criarActionFiltroErosao(self):
-        self.filtroErosao = self.submenuMorfologicas.addAction("&Erosão")
-        self.filtroErosao.setShortcut("Ctrl+Alt+E")
-        self.filtroErosao.setDisabled(True)
-        self.filtroErosao.setCheckable(True)
-        self.filtroErosao.setChecked(False)
-        self.filtroErosao.triggered.connect(lambda: self.transformarImagem(
-            self.filtroErosao, 'Erosao', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-        # Listar action
-        self.listaFiltrosImgPretoBranco.append(self.filtroErosao)
-
-    def criarActionFiltroFechamento(self):
-        self.filtroFechamento = self.submenuMorfologicas.addAction("&Fechamento")
-        self.filtroFechamento.setShortcut("Ctrl+Alt+F")
-        self.filtroFechamento.setDisabled(True)
-        self.filtroFechamento.setCheckable(True)
-        self.filtroFechamento.setChecked(False)
-        self.filtroFechamento.triggered.connect(lambda: self.transformarImagem(
-            self.filtroFechamento, 'Fechamento', self.extensaoImagemOriginal, 'ArgumentoVazio'))
-
-        # Listar action
-        self.listaFiltrosImgPretoBranco.append(self.filtroFechamento)
 
     def criarActionFiltroMediana(self):
         self.filtroMediana = self.submenuFiltrosDesfocar.addAction("Filtro &Mediana")
