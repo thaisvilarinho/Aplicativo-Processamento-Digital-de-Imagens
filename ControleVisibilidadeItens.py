@@ -1,9 +1,10 @@
 class ControleVisibilidadeItens():
-    def __init__(self, opcaoInfoImagem, opcaoSalvarComo):
+    def __init__(self, opcaoInfoImagem, opcaoSalvarComo, opcaoRecente):
         super(ControleVisibilidadeItens, self).__init__()
 
         self.opcaoInfoImagem = opcaoInfoImagem
         self.opcaoSalvarComo = opcaoSalvarComo
+        self.opcaoRecente = opcaoRecente
         self.listaFiltrosImgColoridaCinza = []
         self.listaFiltrosImgPretoBranco = []
         self.listaRemoverFiltrosParaEscalaDeCinza = []
@@ -14,6 +15,7 @@ class ControleVisibilidadeItens():
 
         self.opcaoInfoImagem.setVisible(True)
         self.opcaoSalvarComo.setDisabled(False)
+        self.opcaoRecente.setDisabled(False)
 
         if extensao == '.ppm':
             for filtro in self.listaFiltrosImgColoridaCinza:

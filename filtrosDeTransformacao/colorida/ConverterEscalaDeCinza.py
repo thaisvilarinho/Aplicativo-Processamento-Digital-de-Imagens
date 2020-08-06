@@ -4,7 +4,6 @@
 import sys
 import numpy as np
 
-
 def lerImagemEntrada():
     entrada = open(sys.argv[1], "r+")
 
