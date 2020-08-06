@@ -127,8 +127,8 @@ class MyWindow(QMainWindow):
         if self.opcaoEscolhida == "S&obre o Aplicativo":
             self.caixaMensagem.setWindowTitle("Sobre o Aplicativo")
             self.caixaMensagem.setText("Desenvolvido por Thaís Aparecida Vilarinho de Jesus")
-            self.caixaMensagem.setInformativeText("Capinópolis-MG, 24 de Junho de 2020")
-            self.descricao = "Este aplicativo realiza Transformações em imagens com extensão ppm, pgm e pbm e " \
+            self.caixaMensagem.setInformativeText("Capinópolis-MG, 06 de agosto de 2020")
+            self.descricao = "Este aplicativo realiza Transfgormações em imagens com extensão ppm, pgm e pbm e " \
                              "foi elaborado como forma de trabalho apresentado a disciplina de Processamento Digital" \
                              "de Imagens no Curso Superior em Análise e Desenvolvimento de Sistemas, do Instituto " \
                              "Federal de Educação, Ciência e Tecnologia do Triângulo Mineiro (IFTM) - Campus Ituiutaba"

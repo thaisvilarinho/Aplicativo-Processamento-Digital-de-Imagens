@@ -759,7 +759,7 @@ class ItensMenuTransformacoes():
         self.rotacao180.setCheckable(True)
         self.rotacao180.setChecked(False)
         self.rotacao180.triggered.connect(lambda: self.transformacaoImagens.transformarImagem
-        (self.rotacao180, 'mirror', self.manipulacaoImagens.extensaoImagemOriginal, 'ArgumentoVazio'))
+        (self.rotacao180, 'Rotacionar180', self.manipulacaoImagens.extensaoImagemOriginal, 'ArgumentoVazio'))
 
         # Listar action
         self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.rotacao180)
