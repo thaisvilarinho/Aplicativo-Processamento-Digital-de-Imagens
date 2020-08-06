@@ -1,7 +1,3 @@
-import fnmatch
-import glob
-import os
-import shutil
 import sys
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
@@ -22,20 +18,19 @@ class MyWindow(QMainWindow):
         self.setGeometry(450, 150, 800, 600)
         self.initUI()
 
-
-
         self.show()
 
     def criarInstancias(self):
         # Instâncias classes
-        self.controleVisibilidadeItens = ControleVisibilidadeItens(self.opcaoInfoImagem, self.opcaoSalvarComo)
+        self.controleVisibilidadeItens = ControleVisibilidadeItens(self.opcaoInfoImagem, self.opcaoSalvarComo,
+                                                                   self.submenuAbrirRecente)
         self.controleChecagemFiltros = ControleChecagemFiltros()
-        self.manipulacaoImagens = ManipulacaoImagens(self.imagemOriginal, self.controleVisibilidadeItens,
-                                                     self.controleChecagemFiltros)
+        self.manipulacaoImagens = ManipulacaoImagens(self.imagemExibida, self.controleVisibilidadeItens,
+                                                     self.controleChecagemFiltros, self.submenuAbrirRecente,
+                                                     self.barraStatus)
         self.transformacaoImagens = TransformacaoImagens(self.manipulacaoImagens, self.barraProgresso, self.barraStatus)
         self.itensBarraMenu = ItensMenuTransformacoes(self.controleVisibilidadeItens, self.manipulacaoImagens,
                                                       self.menuTransformacao, self.transformacaoImagens)
-
 
     '''Chamar métodos que criam a interface'''
 
@@ -54,13 +49,13 @@ class MyWindow(QMainWindow):
         self.menuTransformacao = self.barraMenu.addMenu("&Transformações")
         self.menuSobre = self.barraMenu.addMenu("So&bre")
 
-        # Crias as actions
+        # Crias as actions e submenus
         self.opcaoAbrir = self.menuArquivo.addAction("A&brir")
         self.opcaoAbrir.setShortcut("Ctrl+A")
 
-        self.opcaoRecente = self.menuArquivo.addMenu("Abrir &Recente")
-        self.abrirRecente = self.opcaoRecente.addAction("arquivos...")
-        self.abrirRecente.setDisabled(True)
+        # Submenu
+        self.submenuAbrirRecente = self.menuArquivo.addMenu("Abrir &Recente")
+        self.submenuAbrirRecente.setDisabled(True)
 
         self.opcaoSalvarComo = self.menuArquivo.addAction("&Salvar como")
         self.opcaoSalvarComo.setShortcut("Ctrl+S")
@@ -92,7 +87,7 @@ class MyWindow(QMainWindow):
         self.barraProgressoTexto = QLabel("Progresso da Transformação...")
 
         # Criando imagens
-        self.imagemOriginal = QLabel()
+        self.imagemExibida = QLabel()
 
         self.criarInstancias()
 
@@ -113,7 +108,7 @@ class MyWindow(QMainWindow):
         self.layoutRodape = QHBoxLayout()
 
         # Adicionando os widgets
-        self.layoutTopo.addWidget(self.imagemOriginal)
+        self.layoutTopo.addWidget(self.imagemExibida)
         self.layoutRodape.addWidget(self.barraProgressoTexto)
         self.layoutRodape.addWidget(self.barraProgresso)
 
@@ -154,19 +149,19 @@ class MyWindow(QMainWindow):
                 self.caixaMensagem.exec_()
 
     def close(self):
+
         self.manipulacaoImagens.excluirCopiaImgTransformada()
 
         if self.manipulacaoImagens.procurarImagemTransformadaNaoSalva():
             caixaAviso = QMessageBox.question(self, "Sair do Aplicativo",
-                                                   "Há uma imagem transformada sem salvar, "
-                                                   "deseja salvar imagem antes de sair?",
-                                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                                              "Há uma imagem transformada sem salvar, "
+                                              "deseja salvar imagem antes de sair?",
+                                              QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if caixaAviso == QMessageBox.Yes:
                 self.manipulacaoImagens.salvarImagemComo()
 
         self.manipulacaoImagens.excluirImagemTransformadaNaoSalva()
         sys.exit()
-
 
 
 def main():

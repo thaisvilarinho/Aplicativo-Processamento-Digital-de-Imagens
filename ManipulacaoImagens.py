@@ -1,9 +1,8 @@
 import os
 import shutil
 from win32api import GetSystemMetrics
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import *
-
 from PyQt5.QtGui import QPixmap
 
 
@@ -12,9 +11,10 @@ def ocultarDiretorioImgResultado():
 
 
 class ManipulacaoImagens(QWidget):
-    def __init__(self, imagemOriginal, controleVisibilidadeItens, controleChecagemFiltros):
+    def __init__(self, imagemExibida, controleVisibilidadeItens, controleChecagemFiltros, submenuAbrirRecente,
+                 barraStatus):
         super(ManipulacaoImagens, self).__init__()
-        self.imagemOriginal = imagemOriginal
+        self.imagemExibida = imagemExibida
         self.imagemResultado = 'imagensResultado/imagemTransformada'
         self.extensaoImagemResultado = '.ppm'
         self.extensaoImagemOriginal = ''
@@ -22,28 +22,50 @@ class ManipulacaoImagens(QWidget):
         self.endImagemResultado = ''
         self.controleVisibilidadeItens = controleVisibilidadeItens
         self.controleChecagemFiltros = controleChecagemFiltros
+        self.listaImagensRecentes = []
+        self.submenuAbrirRecente = submenuAbrirRecente
+        self.barraStatus = barraStatus
 
-    '''Abre imagem selecionada pelo usuário e mantêm oculta diretório que mantem cópias de imagens anteriores que foram 
-    transformadas, também solicita habilitar visibilidade dos menus e ações, remoção de cópias de imagens anteriores 
-    transformadas, zera porcentagem da barra de progresso, defini pixmap da Imagem a ser exibida'''
+    '''Abre imagem selecionada pelo usuário'''
 
     def abrirImagem(self):
         ocultarDiretorioImgResultado()
 
-        arquivoImagem, _ = QFileDialog.getOpenFileName(self, caption="Abrir Imagem",
-                                                       directory=QtCore.QDir.currentPath(),
-                                                       filter='Imagens(*.ppm; *.pgm; *.pbm)',
-                                                       initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
+        arquivoImagemAberta, tipos = QFileDialog.getOpenFileName(self, caption="Abrir Imagem",
+                                                             directory=QtCore.QDir.currentPath(),
+                                                             filter='Imagens(*.ppm; *.pgm; *.pbm)',
+                                                             initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
 
-        if arquivoImagem:
+        if arquivoImagemAberta:
             self.excluirCopiaImgTransformada()
             self.controleChecagemFiltros.removerChecagemFiltrosUsados()
-            self.endImagemOriginal = arquivoImagem
-            self.pixmapImagem = QPixmap(self.endImagemOriginal)
-            self.extensaoImagemOriginal = os.path.splitext(os.path.basename(arquivoImagem))[1]
-            self.extrairInfoImagem()
-            self.exibirImagem()
+            self.substituirEnderecoImgOriginal(arquivoImagemAberta)
+            self.controlarListaImagensRecentes(arquivoImagemAberta)
             self.controleVisibilidadeItens.alterarVisibilidadeItensMenuTransformacoes(self.extensaoImagemOriginal)
+
+    def substituirEnderecoImgOriginal(self, arquivoImagemAberta):
+        self.endImagemOriginal = arquivoImagemAberta
+        self.pixmapImagem = QPixmap(self.endImagemOriginal)
+        self.extensaoImagemOriginal = os.path.splitext(os.path.basename(arquivoImagemAberta))[1]
+        self.exibirImagem()
+        self.extrairInfoImagem()
+        self.barraStatus.showMessage('Usuário carregou a imagem ' + self.nomeimagem, 3000)
+
+    def controlarListaImagensRecentes(self, arquivoImagemRecente):
+        imagemRecente = ''
+        if arquivoImagemRecente not in self.listaImagensRecentes:
+            self.listaImagensRecentes.append(arquivoImagemRecente)
+
+            for arquivo in self.listaImagensRecentes:
+                imagemRecente = QtWidgets.QAction(arquivo, self)
+            self.submenuAbrirRecente.addAction(imagemRecente)
+            imagemRecente.triggered.connect(lambda: self.abrirImagemRecente(arquivo))
+
+    def abrirImagemRecente(self, arquivoImagemAberta):
+        self.excluirCopiaImgTransformada()
+        self.substituirEnderecoImgOriginal(arquivoImagemAberta)
+        self.controleChecagemFiltros.removerChecagemFiltrosUsados()
+        self.controleVisibilidadeItens.alterarVisibilidadeItensMenuTransformacoes(self.extensaoImagemOriginal)
 
     '''Exibe informações sobre aplicativo e imagem quando selecionado menu Sobre'''
 
@@ -67,8 +89,8 @@ class ManipulacaoImagens(QWidget):
             self.pixmapImagem = self.pixmapImagem.scaled(int(GetSystemMetrics(0) / 2), int(GetSystemMetrics(1) / 2),
                                                          QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
-        self.imagemOriginal.setPixmap(self.pixmapImagem)
-        self.imagemOriginal.setAlignment(QtCore.Qt.AlignCenter)
+        self.imagemExibida.setPixmap(self.pixmapImagem)
+        self.imagemExibida.setAlignment(QtCore.Qt.AlignCenter)
 
     '''Salva Imagem com nome de arquivo e diretório escolhidos pelo usuário. Procura pela imagem transformada, caso
     não exista, é salvo a imagem original com o nome que o usuário escolher'''
@@ -83,20 +105,24 @@ class ManipulacaoImagens(QWidget):
                 if imagemSalvaComo:
                     self.parts = imagemSalvaComo.rpartition('/')
                     self.enderecoSalvo = self.parts[0]
+                    nomeImagemSalva = os.path.splitext(os.path.basename(imagemSalvaComo))[0]
+                    novoDiretorio = ''
+
                     if self.endImagemResultado != '':
-                        shutil.move(self.endImagemResultado, self.enderecoSalvo + '/' +
-                                   os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
-                                   self.extensaoImagemResultado)
+                        novoDiretorio = self.enderecoSalvo + '/' + nomeImagemSalva + self.extensaoImagemResultado
+                        shutil.move(self.endImagemResultado, novoDiretorio)
                     else:
-                        shutil.copyfile(self.endImagemOriginal, self.enderecoSalvo + '/' +
-                                        os.path.splitext(os.path.basename(imagemSalvaComo))[0] +
-                                        self.extensaoImagemOriginal)
+                        novoDiretorio = self.enderecoSalvo + '/' + nomeImagemSalva + self.extensaoImagemOriginal
+                        shutil.copyfile(self.endImagemOriginal, novoDiretorio)
+
+                    self.barraStatus.showMessage('Usuário salvou a imagem como ' + nomeImagemSalva +
+                                                 self.extensaoImagemResultado, 3000)
+                    self.controlarListaImagensRecentes(novoDiretorio)
         except:
             pass
 
     def procurarImagemTransformadaNaoSalva(self):
         return os.path.exists(self.imagemResultado + self.extensaoImagemResultado)
-
 
     def excluirCopiaImgTransformada(self):
         try:
