@@ -22,6 +22,7 @@ class ItensMenuTransformacoes():
         self.criarSubmenuDeteccaoDeBordas()
         self.criarSubmenuInverterCores()
         self.criarSubmenuRealcarIntensidade()
+        self.criarSubmenuRotacionar()
         self.criarSubmenuMorfologicas()
 
     '''Criar Submenus'''
@@ -48,6 +49,20 @@ class ItensMenuTransformacoes():
 
         # Listar submenu
         self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.submenuRealcarIntensidade)
+
+    def criarSubmenuRotacionar(self):
+        # Submenu
+        self.submenuRotacionar = self.menuTransformacao.addMenu("&Rotacionar")
+        self.submenuRotacionar.setDisabled(True)
+
+        # Actions do submenu
+        self.criarRotacao180()
+        self.criarRotacaoHorario()
+        self.criarRotacaoAntiHorario()
+
+        # Listar submenu
+        self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.submenuRotacionar)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.submenuRotacionar)
 
     def criarSubmenuConversao(self):
         # Submenu
@@ -102,7 +117,6 @@ class ItensMenuTransformacoes():
         # Criar novos submenus
         self.criarSubmenuDeteccaoDeBordasDilatacao()
         self.criarSubmenuDeteccaoDeBordasErosao()
-
 
         # Listar submenu
         self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.submenuFiltrosDeteccaoBordas)
@@ -212,7 +226,6 @@ class ItensMenuTransformacoes():
         # Listar submenu
         self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.submenuDeteccaoDeBordasDilatacao)
 
-
     def criarSubmenuDeteccaoDeBordasErosao(self):
         self.submenuDeteccaoDeBordasErosao = self.submenuFiltrosDeteccaoBordas.addMenu("Filtro Detecção com &Erosão")
         self.submenuDeteccaoDeBordasErosao.setDisabled(True)
@@ -311,7 +324,6 @@ class ItensMenuTransformacoes():
         # Listar action
         self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.deteccaoDeBordasFiltroCrono)
         self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasFiltroCrono)
-
 
     def criarActionDeteccaoDeBordasMarle(self):
         self.deteccaoDeBordasFiltroMarle = self.submenuFiltrosDeteccaoBordas.addAction("Filtro Marle")
@@ -533,102 +545,132 @@ class ItensMenuTransformacoes():
         self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.fechamentoElementoEstruturante9x9)
 
     def criarActionDeteccaoDeBordasDilatacao3x3(self):
-        self.deteccaoDeBordasDilatacaoElementoEstruturante3x3 = self.submenuDeteccaoDeBordasDilatacao.addAction("Elemento Estruturante 3x3")
+        self.deteccaoDeBordasDilatacaoElementoEstruturante3x3 = self.submenuDeteccaoDeBordasDilatacao.addAction(
+            "Elemento Estruturante 3x3")
         self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.setShortcut("Ctrl+B+3")
         self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.setDisabled(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.setCheckable(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.setChecked(False)
-        self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (3, 3, self.deteccaoDeBordasDilatacaoElementoEstruturante3x3, 'DeteccaoDeBordasDilatacao',
-         self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasDilatacaoElementoEstruturante3x3.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (3, 3, self.deteccaoDeBordasDilatacaoElementoEstruturante3x3, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasDilatacaoElementoEstruturante3x3)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasDilatacaoElementoEstruturante3x3)
 
     def criarActionDeteccaoDeBordasDilatacao5x5(self):
-        self.deteccaoDeBordasDilatacaoElementoEstruturante5x5 = self.submenuDeteccaoDeBordasDilatacao.addAction("Elemento Estruturante 5x5")
+        self.deteccaoDeBordasDilatacaoElementoEstruturante5x5 = self.submenuDeteccaoDeBordasDilatacao.addAction(
+            "Elemento Estruturante 5x5")
         self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.setShortcut("Ctrl+B+5")
         self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.setDisabled(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.setCheckable(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.setChecked(False)
-        self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (5, 5, self.deteccaoDeBordasDilatacaoElementoEstruturante5x5, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasDilatacaoElementoEstruturante5x5.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (5, 5, self.deteccaoDeBordasDilatacaoElementoEstruturante5x5, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasDilatacaoElementoEstruturante5x5)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasDilatacaoElementoEstruturante5x5)
 
     def criarActionDeteccaoDeBordasDilatacao7x7(self):
-        self.deteccaoDeBordasDilatacaoElementoEstruturante7x7 = self.submenuDeteccaoDeBordasDilatacao.addAction("Elemento Estruturante 7x7")
+        self.deteccaoDeBordasDilatacaoElementoEstruturante7x7 = self.submenuDeteccaoDeBordasDilatacao.addAction(
+            "Elemento Estruturante 7x7")
         self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.setShortcut("Ctrl+B+7")
         self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.setDisabled(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.setCheckable(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.setChecked(False)
-        self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (7, 7, self.deteccaoDeBordasDilatacaoElementoEstruturante7x7, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasDilatacaoElementoEstruturante7x7.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (7, 7, self.deteccaoDeBordasDilatacaoElementoEstruturante7x7, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasDilatacaoElementoEstruturante7x7)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasDilatacaoElementoEstruturante7x7)
 
     def criarActionDeteccaoDeBordasDilatacao9x9(self):
-        self.deteccaoDeBordasDilatacaoElementoEstruturante9x9 = self.submenuDeteccaoDeBordasDilatacao.addAction("Elemento Estruturante 9x9")
+        self.deteccaoDeBordasDilatacaoElementoEstruturante9x9 = self.submenuDeteccaoDeBordasDilatacao.addAction(
+            "Elemento Estruturante 9x9")
         self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.setShortcut("Ctrl+B+9")
         self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.setDisabled(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.setCheckable(True)
         self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.setChecked(False)
-        self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (9, 9, self.deteccaoDeBordasDilatacaoElementoEstruturante9x9, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasDilatacaoElementoEstruturante9x9.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (9, 9, self.deteccaoDeBordasDilatacaoElementoEstruturante9x9, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasDilatacaoElementoEstruturante9x9)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasDilatacaoElementoEstruturante9x9)
 
     def criarActionDeteccaoDeBordasErosaoElementoEstrutura3x3(self):
-        self.deteccaoDeBordasErosaoElementoEstruturante3x3 = self.submenuDeteccaoDeBordasErosao.addAction("Elemento Estruturante 3x3")
+        self.deteccaoDeBordasErosaoElementoEstruturante3x3 = self.submenuDeteccaoDeBordasErosao.addAction(
+            "Elemento Estruturante 3x3")
         self.deteccaoDeBordasErosaoElementoEstruturante3x3.setShortcut("Ctrl+R+3")
         self.deteccaoDeBordasErosaoElementoEstruturante3x3.setDisabled(True)
         self.deteccaoDeBordasErosaoElementoEstruturante3x3.setCheckable(True)
         self.deteccaoDeBordasErosaoElementoEstruturante3x3.setChecked(False)
-        self.deteccaoDeBordasErosaoElementoEstruturante3x3.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (3, 3, self.deteccaoDeBordasErosaoElementoEstruturante3x3, 'DeteccaoDeBordasErosao',
-         self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasErosaoElementoEstruturante3x3.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (3, 3, self.deteccaoDeBordasErosaoElementoEstruturante3x3, 'DeteccaoDeBordasErosao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasErosaoElementoEstruturante3x3)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasErosaoElementoEstruturante3x3)
 
     def criarActionDeteccaoDeBordasErosaoElementoEstrutura5x5(self):
-        self.deteccaoDeBordasErosaoElementoEstruturante5x5 = self.submenuDeteccaoDeBordasErosao.addAction("Elemento Estruturante 5x5")
+        self.deteccaoDeBordasErosaoElementoEstruturante5x5 = self.submenuDeteccaoDeBordasErosao.addAction(
+            "Elemento Estruturante 5x5")
         self.deteccaoDeBordasErosaoElementoEstruturante5x5.setShortcut("Ctrl+R+5")
         self.deteccaoDeBordasErosaoElementoEstruturante5x5.setDisabled(True)
         self.deteccaoDeBordasErosaoElementoEstruturante5x5.setCheckable(True)
         self.deteccaoDeBordasErosaoElementoEstruturante5x5.setChecked(False)
-        self.deteccaoDeBordasErosaoElementoEstruturante5x5.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (5, 5, self.deteccaoDeBordasErosaoElementoEstruturante5x5, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasErosaoElementoEstruturante5x5.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (5, 5, self.deteccaoDeBordasErosaoElementoEstruturante5x5, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasErosaoElementoEstruturante5x5)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasErosaoElementoEstruturante5x5)
 
     def criarActionDeteccaoDeBordasErosaoElementoEstrutura7x7(self):
-        self.deteccaoDeBordasErosaoElementoEstruturante7x7 = self.submenuDeteccaoDeBordasErosao.addAction("Elemento Estruturante 7x7")
+        self.deteccaoDeBordasErosaoElementoEstruturante7x7 = self.submenuDeteccaoDeBordasErosao.addAction(
+            "Elemento Estruturante 7x7")
         self.deteccaoDeBordasErosaoElementoEstruturante7x7.setShortcut("Ctrl+R+7")
         self.deteccaoDeBordasErosaoElementoEstruturante7x7.setDisabled(True)
         self.deteccaoDeBordasErosaoElementoEstruturante7x7.setCheckable(True)
         self.deteccaoDeBordasErosaoElementoEstruturante7x7.setChecked(False)
-        self.deteccaoDeBordasErosaoElementoEstruturante7x7.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (7, 7, self.deteccaoDeBordasErosaoElementoEstruturante7x7, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasErosaoElementoEstruturante7x7.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (7, 7, self.deteccaoDeBordasErosaoElementoEstruturante7x7, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasErosaoElementoEstruturante7x7)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasErosaoElementoEstruturante7x7)
 
     def criarActionDeteccaoDeBordasErosaoElementoEstrutura9x9(self):
-        self.deteccaoDeBordasErosaoElementoEstruturante9x9 = self.submenuDeteccaoDeBordasErosao.addAction("Elemento Estruturante 9x9")
+        self.deteccaoDeBordasErosaoElementoEstruturante9x9 = self.submenuDeteccaoDeBordasErosao.addAction(
+            "Elemento Estruturante 9x9")
         self.deteccaoDeBordasErosaoElementoEstruturante9x9.setShortcut("Ctrl+R+9")
         self.deteccaoDeBordasErosaoElementoEstruturante9x9.setDisabled(True)
         self.deteccaoDeBordasErosaoElementoEstruturante9x9.setCheckable(True)
         self.deteccaoDeBordasErosaoElementoEstruturante9x9.setChecked(False)
-        self.deteccaoDeBordasErosaoElementoEstruturante9x9.triggered.connect(lambda: self.criarJanelaDesenharElementoEstruturante
-        (9, 9, self.deteccaoDeBordasErosaoElementoEstruturante9x9, 'DeteccaoDeBordasDilatacao', self.manipulacaoImagens.extensaoImagemOriginal))
+        self.deteccaoDeBordasErosaoElementoEstruturante9x9.triggered.connect(
+            lambda: self.criarJanelaDesenharElementoEstruturante
+            (9, 9, self.deteccaoDeBordasErosaoElementoEstruturante9x9, 'DeteccaoDeBordasDilatacao',
+             self.manipulacaoImagens.extensaoImagemOriginal))
 
         # Listar action
-        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.deteccaoDeBordasErosaoElementoEstruturante9x9)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(
+            self.deteccaoDeBordasErosaoElementoEstruturante9x9)
 
     def criarActionKernelGaussiano3x3(self):
         self.kernelGaussiano3x3 = self.submenuFiltroGaussiano.addAction("Matriz 3x3")
@@ -710,6 +752,46 @@ class ItensMenuTransformacoes():
         # Listar action
         self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.filtroNegativo)
 
+    def criarRotacao180(self):
+        self.rotacao180 = self.submenuRotacionar.addAction("Rotação 180º")
+        self.rotacao180.setShortcut("Ctrl+Shift+UP")
+        self.rotacao180.setDisabled(True)
+        self.rotacao180.setCheckable(True)
+        self.rotacao180.setChecked(False)
+        self.rotacao180.triggered.connect(lambda: self.transformacaoImagens.transformarImagem
+        (self.rotacao180, 'mirror', self.manipulacaoImagens.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.rotacao180)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.rotacao180)
+
+    def criarRotacaoHorario(self):
+        self.rotacaoHorario = self.submenuRotacionar.addAction("Rotação 90º")
+        self.rotacaoHorario.setShortcut("Ctrl+Shift+RIGHT")
+        self.rotacaoHorario.setDisabled(True)
+        self.rotacaoHorario.setCheckable(True)
+        self.rotacaoHorario.setChecked(False)
+        self.rotacaoHorario.triggered.connect(lambda: self.transformacaoImagens.transformarImagem
+        (self.rotacaoHorario, 'RotacionarHorario', self.manipulacaoImagens.extensaoImagemOriginal, 'ArgumentoVazio'))
+
+        # Listar action
+        self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.rotacaoHorario)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.rotacaoHorario)
+
+    def criarRotacaoAntiHorario(self):
+        self.rotacaoAntiHorario = self.submenuRotacionar.addAction("Rotação -90º")
+        self.rotacaoAntiHorario.setShortcut("Ctrl+Shift+LEFT")
+        self.rotacaoAntiHorario.setDisabled(True)
+        self.rotacaoAntiHorario.setCheckable(True)
+        self.rotacaoAntiHorario.setChecked(False)
+        self.rotacaoAntiHorario.triggered.connect(lambda: self.transformacaoImagens.transformarImagem
+        (self.rotacaoAntiHorario, 'RotacionarAntiHorario', self.manipulacaoImagens.extensaoImagemOriginal,
+         'ArgumentoVazio'))
+
+        # Listar action
+        self.controleVisibilidadeItens.listaFiltrosImgColoridaCinza.append(self.rotacaoAntiHorario)
+        self.controleVisibilidadeItens.listaFiltrosImgPretoBranco.append(self.rotacaoAntiHorario)
+
     def criarActionTransformacaoLogaritmica(self):
         self.transformacaoLogaritmica = self.submenuRealcarIntensidade.addAction("Transformação &Logarítmica")
         self.transformacaoLogaritmica.setShortcut("Ctrl+Shift+L")
@@ -777,12 +859,13 @@ class ItensMenuTransformacoes():
     def pegarValorLimitePretoBranco(self):
         valorLimitePretoBranco = str(self.janelaValorLimitePretoBranco.valorSlider)
         self.janelaValorLimitePretoBranco.close()
-        self.conectarMetodosEntreClasses(self.converterParaPretoBranco, 'ConverterImagemBinaria', '.pbm', valorLimitePretoBranco)
+        self.conectarMetodosEntreClasses(self.converterParaPretoBranco, 'ConverterImagemBinaria', '.pbm',
+                                         valorLimitePretoBranco)
 
     ''' Invocar método de transformar Imagens e alterarVisibilidade Itens do Menu para quando uma imagem for 
     transformanda em outra tipo'''
+
     def conectarMetodosEntreClasses(self, filtro, script, extensao, valorArgumento3):
         self.transformacaoImagens.transformarImagem(filtro, script, extensao, valorArgumento3)
 
         self.controleVisibilidadeItens.alterarVisibilidadeItensMenuTransformacoes(extensao)
-

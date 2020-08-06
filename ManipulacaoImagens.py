@@ -15,16 +15,17 @@ class ManipulacaoImagens(QWidget):
                  barraStatus):
         super(ManipulacaoImagens, self).__init__()
         self.imagemExibida = imagemExibida
+        self.controleVisibilidadeItens = controleVisibilidadeItens
+        self.controleChecagemFiltros = controleChecagemFiltros
+        self.submenuAbrirRecente = submenuAbrirRecente
+        self.barraStatus = barraStatus
         self.imagemResultado = 'imagensResultado/imagemTransformada'
         self.extensaoImagemResultado = '.ppm'
         self.extensaoImagemOriginal = ''
         self.endImagemOriginal = ''
         self.endImagemResultado = ''
-        self.controleVisibilidadeItens = controleVisibilidadeItens
-        self.controleChecagemFiltros = controleChecagemFiltros
         self.listaImagensRecentes = []
-        self.submenuAbrirRecente = submenuAbrirRecente
-        self.barraStatus = barraStatus
+        self.rotacao = 0
 
     '''Abre imagem selecionada pelo usuário'''
 
@@ -32,9 +33,9 @@ class ManipulacaoImagens(QWidget):
         ocultarDiretorioImgResultado()
 
         arquivoImagemAberta, tipos = QFileDialog.getOpenFileName(self, caption="Abrir Imagem",
-                                                             directory=QtCore.QDir.currentPath(),
-                                                             filter='Imagens(*.ppm; *.pgm; *.pbm)',
-                                                             initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
+                                                                 directory=QtCore.QDir.currentPath(),
+                                                                 filter='Imagens(*.ppm; *.pgm; *.pbm)',
+                                                                 initialFilter='Imagens(*.ppm; *.pgm; *.pbm)')
 
         if arquivoImagemAberta:
             self.excluirCopiaImgTransformada()

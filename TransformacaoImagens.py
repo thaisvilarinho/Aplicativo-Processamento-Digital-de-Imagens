@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPixmap
 
 
@@ -56,7 +57,7 @@ class TransformacaoImagens():
                     break
 
             self.manipulacaoImagens.endImagemResultado = self.manipulacaoImagens.imagemResultado + \
-                                      self.manipulacaoImagens.extensaoImagemResultado
+                                                         self.manipulacaoImagens.extensaoImagemResultado
             self.manipulacaoImagens.pixmapImagem = QPixmap(self.manipulacaoImagens.endImagemResultado)
             shutil.copyfile(self.manipulacaoImagens.endImagemResultado, self.manipulacaoImagens.imagemResultado +
                             "Copia" + self.manipulacaoImagens.extensaoImagemResultado)
